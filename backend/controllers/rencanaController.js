@@ -1,92 +1,151 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 const { normalizeArrayField, validateIbuRelation } = require("./helpers");
 
-const getRencana = (req, res) => {
-  res.json(getItems("rencana"));
+// GET ALL
+const TampilDataRencana = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM rencana";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data rencana persalinan",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createRencana = (req, res) => {
-  const {
-    ibu_id,
-    penolong,
-    tempat,
-    pendamping,
-    transportasi,
-    calon_donor,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// CREATE
+const CreateDataRencana = async (req, res, next) => {
+  try {
+    const {
+      ibu_id,
+      penolong,
+      tempat,
+      pendamping,
+      transportasi,
+      calon_donor,
+    } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const donor = normalizeArrayField(calon_donor).join(",");
+
+    const query = `
+      INSERT INTO rencana
+      (ibu_id, penolong, tempat, pendamping, transportasi, calon_donor)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      ibu_id,
+      penolong || "",
+      tempat || "",
+      pendamping || "",
+      transportasi || "",
+      donor,
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan rencana persalinan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("rencana", {
-    ibu_id: Number(ibu_id),
-    penolong: penolong || "",
-    tempat: tempat || "",
-    pendamping: pendamping || "",
-    transportasi: transportasi || "",
-    calon_donor: normalizeArrayField(calon_donor),
-  });
-
-  addActivity(`Rencana persalinan untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updateRencana = (req, res) => {
-  const { id } = req.params;
-  const {
-    ibu_id,
-    penolong,
-    tempat,
-    pendamping,
-    transportasi,
-    calon_donor,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// UPDATE
+const UpdateDataRencana = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const {
+      ibu_id,
+      penolong,
+      tempat,
+      pendamping,
+      transportasi,
+      calon_donor,
+    } = req.body;
+
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const donor = normalizeArrayField(calon_donor).join(",");
+
+    const query = `
+      UPDATE rencana
+      SET ibu_id=?, penolong=?, tempat=?, pendamping=?, transportasi=?, calon_donor=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      ibu_id,
+      penolong || "",
+      tempat || "",
+      pendamping || "",
+      transportasi || "",
+      donor,
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data rencana persalinan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update rencana persalinan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("rencana", id, {
-    ibu_id: Number(ibu_id),
-    penolong: penolong || "",
-    tempat: tempat || "",
-    pendamping: pendamping || "",
-    transportasi: transportasi || "",
-    calon_donor: normalizeArrayField(calon_donor),
-  });
-
-  if (!updatedItem) {
-    return res.status(404).json({ message: "Rencana persalinan tidak ditemukan." });
-  }
-
-  addActivity(`Rencana persalinan untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deleteRencana = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("rencana", id);
+// DELETE
+const DeleteDataRencana = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res.status(404).json({ message: "Rencana persalinan tidak ditemukan." });
+    const query = "DELETE FROM rencana WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data rencana persalinan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete rencana persalinan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Rencana persalinan untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Rencana persalinan berhasil dihapus." });
 };
 
 module.exports = {
-  createRencana,
-  deleteRencana,
-  getRencana,
-  updateRencana,
+  TampilDataRencana,
+  CreateDataRencana,
+  UpdateDataRencana,
+  DeleteDataRencana,
 };

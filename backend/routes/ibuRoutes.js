@@ -1,16 +1,17 @@
 const express = require("express");
+
 const {
-  createIbu,
-  deleteIbu,
-  getIbu,
-  updateIbu,
+  TampilDataIbu,
+  CreateDataIbu,
+  UpdateDataIbu,
+  DeleteDataIbu,
 } = require("../controllers/ibuController");
 
 const router = express.Router();
 
-router.get("/", getIbu);
-router.post("/", createIbu);
-router.put("/:id", updateIbu);
-router.delete("/:id", deleteIbu);
+router.get("/", TampilDataIbu);
+router.post("/", CreateDataIbu);
+router.put("/:id", UpdateDataIbu);
+router.delete("/:id", DeleteDataIbu);
 
 module.exports = router;

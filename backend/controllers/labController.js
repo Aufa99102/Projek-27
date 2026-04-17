@@ -1,76 +1,129 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
-const getLab = (req, res) => {
-  res.json(getItems("lab"));
+// GET ALL
+const TampilData = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM lab";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data lab",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createLab = (req, res) => {
-  const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// CREATE
+const CreateData = async (req, res, next) => {
+  try {
+    const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      INSERT INTO lab (ibu_id, hb, albumin, hbsag, hiv)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      ibu_id,
+      hb || "",
+      albumin || "",
+      hbsag || "",
+      hiv || "",
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data lab",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("lab", {
-    ibu_id: Number(ibu_id),
-    hb: hb || "",
-    albumin: albumin || "",
-    hbsag: hbsag || "",
-    hiv: hiv || "",
-  });
-
-  addActivity(`Data lab untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updateLab = (req, res) => {
-  const { id } = req.params;
-  const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// UPDATE
+const UpdateData = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      UPDATE lab
+      SET ibu_id=?, hb=?, albumin=?, hbsag=?, hiv=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      ibu_id,
+      hb || "",
+      albumin || "",
+      hbsag || "",
+      hiv || "",
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data lab tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data lab",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("lab", id, {
-    ibu_id: Number(ibu_id),
-    hb: hb || "",
-    albumin: albumin || "",
-    hbsag: hbsag || "",
-    hiv: hiv || "",
-  });
-
-  if (!updatedItem) {
-    return res.status(404).json({ message: "Data lab tidak ditemukan." });
-  }
-
-  addActivity(`Data lab untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deleteLab = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("lab", id);
+// DELETE
+const DeleteData = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res.status(404).json({ message: "Data lab tidak ditemukan." });
+    const query = "DELETE FROM lab WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data lab tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data lab",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Data lab untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Data lab berhasil dihapus." });
 };
 
 module.exports = {
-  createLab,
-  deleteLab,
-  getLab,
-  updateLab,
+  TampilData,
+  CreateData,
+  UpdateData,
+  DeleteData,
 };

@@ -1,16 +1,16 @@
 const express = require("express");
 const {
-  createUsg,
-  deleteUsg,
-  getUsg,
-  updateUsg,
+  TampilDataUsg,  
+  CreateDataUsg,
+  UpdateDataUsg,
+  DeleteDataUsg,
 } = require("../controllers/usgController");
 
 const router = express.Router();
 
-router.get("/", getUsg);
-router.post("/", createUsg);
-router.put("/:id", updateUsg);
-router.delete("/:id", deleteUsg);
+router.get("/", TampilDataUsg);
+router.post("/", CreateDataUsg);
+router.put("/:id", UpdateDataUsg);
+router.delete("/:id", DeleteDataUsg);
 
 module.exports = router;

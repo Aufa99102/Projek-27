@@ -1,96 +1,151 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
-const getUsg = (req, res) => {
-  res.json(getItems("usg"));
+// GET ALL
+const TampilDataUsg = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM usg";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data USG",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createUsg = (req, res) => {
-  const {
-    ibu_id,
-    trimester,
-    gs,
-    crl,
-    djj,
-    letak_janin,
-    taksiran_persalinan,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// CREATE
+const CreateDataUsg = async (req, res, next) => {
+  try {
+    const {
+      ibu_id,
+      trimester,
+      gs,
+      crl,
+      djj,
+      letak_janin,
+      taksiran_persalinan,
+    } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      INSERT INTO usg
+      (ibu_id, trimester, gs, crl, djj, letak_janin, taksiran_persalinan)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      ibu_id,
+      trimester || "",
+      gs || "",
+      crl || "",
+      djj || "",
+      letak_janin || "",
+      taksiran_persalinan || "",
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data USG",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("usg", {
-    ibu_id: Number(ibu_id),
-    trimester: trimester || "",
-    gs: gs || "",
-    crl: crl || "",
-    djj: djj || "",
-    letak_janin: letak_janin || "",
-    taksiran_persalinan: taksiran_persalinan || "",
-  });
-
-  addActivity(`Data USG untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updateUsg = (req, res) => {
-  const { id } = req.params;
-  const {
-    ibu_id,
-    trimester,
-    gs,
-    crl,
-    djj,
-    letak_janin,
-    taksiran_persalinan,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// UPDATE
+const UpdateDataUsg = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const {
+      ibu_id,
+      trimester,
+      gs,
+      crl,
+      djj,
+      letak_janin,
+      taksiran_persalinan,
+    } = req.body;
+
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      UPDATE usg
+      SET ibu_id=?, trimester=?, gs=?, crl=?, djj=?, letak_janin=?, taksiran_persalinan=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      ibu_id,
+      trimester || "",
+      gs || "",
+      crl || "",
+      djj || "",
+      letak_janin || "",
+      taksiran_persalinan || "",
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data USG tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data USG",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("usg", id, {
-    ibu_id: Number(ibu_id),
-    trimester: trimester || "",
-    gs: gs || "",
-    crl: crl || "",
-    djj: djj || "",
-    letak_janin: letak_janin || "",
-    taksiran_persalinan: taksiran_persalinan || "",
-  });
-
-  if (!updatedItem) {
-    return res.status(404).json({ message: "Data USG tidak ditemukan." });
-  }
-
-  addActivity(`Data USG untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deleteUsg = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("usg", id);
+// DELETE
+const DeleteDataUsg = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res.status(404).json({ message: "Data USG tidak ditemukan." });
+    const query = "DELETE FROM usg WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data USG tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data USG",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Data USG untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Data USG berhasil dihapus." });
 };
 
 module.exports = {
-  createUsg,
-  deleteUsg,
-  getUsg,
-  updateUsg,
+  TampilDataUsg,
+  CreateDataUsg,
+  UpdateDataUsg,
+  DeleteDataUsg,
 };

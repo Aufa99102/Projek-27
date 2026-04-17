@@ -1,16 +1,16 @@
 const express = require("express");
 const {
-  createPersalinan,
-  deletePersalinan,
-  getPersalinan,
-  updatePersalinan,
+  TampilDataPersalinan,
+  CreateDataPersalinan,
+  UpdateDataPersalinan,
+  DeleteDataPersalinan,
 } = require("../controllers/persalinanController");
 
 const router = express.Router();
 
-router.get("/", getPersalinan);
-router.post("/", createPersalinan);
-router.put("/:id", updatePersalinan);
-router.delete("/:id", deletePersalinan);
+router.get("/", TampilDataPersalinan);
+router.post("/", CreateDataPersalinan);
+router.put("/:id", UpdateDataPersalinan);
+router.delete("/:id", DeleteDataPersalinan);
 
 module.exports = router;

@@ -1,16 +1,17 @@
 const express = require("express");
+
 const {
-  createLab,
-  deleteLab,
-  getLab,
-  updateLab,
+  TampilData,
+  CreateData,
+  UpdateData,
+  DeleteData,
 } = require("../controllers/labController");
 
 const router = express.Router();
 
-router.get("/", getLab);
-router.post("/", createLab);
-router.put("/:id", updateLab);
-router.delete("/:id", deleteLab);
+router.get("/", TampilData);
+router.post("/", CreateData);
+router.put("/:id", UpdateData);
+router.delete("/:id", DeleteData);
 
 module.exports = router;

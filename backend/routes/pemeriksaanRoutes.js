@@ -1,16 +1,16 @@
 const express = require("express");
 const {
-  createPemeriksaan,
-  deletePemeriksaan,
-  getPemeriksaan,
-  updatePemeriksaan,
+  TampilDataPemeriksaan,
+  CreateDataPemeriksaan,
+  UpdateDataPemeriksaan,
+  DeleteDataPemeriksaan,
 } = require("../controllers/pemeriksaanController");
 
 const router = express.Router();
 
-router.get("/", getPemeriksaan);
-router.post("/", createPemeriksaan);
-router.put("/:id", updatePemeriksaan);
-router.delete("/:id", deletePemeriksaan);
+router.get("/", TampilDataPemeriksaan);
+router.post("/", CreateDataPemeriksaan);
+router.put("/:id", UpdateDataPemeriksaan);
+router.delete("/:id", DeleteDataPemeriksaan);
 
 module.exports = router;

@@ -1,105 +1,156 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 
-const getIbu = (req, res) => {
-  res.json(getItems("ibu"));
-};
+// GET ALL
+const TampilDataIbu = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM ibu";
+    const [rows] = await db.execute(query);
 
-const createIbu = (req, res) => {
-  const {
-    nama,
-    tanggal_lahir,
-    nama_suami,
-    alamat,
-    no_hp,
-    nik,
-    no_jkn,
-    no_rekam_medis,
-    golongan_darah,
-  } = req.body;
-
-  if (!nama || !tanggal_lahir || !nik) {
-    return res.status(400).json({
-      message: "Field nama, tanggal_lahir, dan nik wajib diisi.",
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data ibu",
+      data: rows,
     });
+  } catch (error) {
+    next(error);
   }
-
-  const newIbu = createItem("ibu", {
-    nama,
-    tanggal_lahir,
-    nama_suami: nama_suami || "",
-    alamat: alamat || "",
-    no_hp: no_hp || "",
-    nik,
-    no_jkn: no_jkn || "",
-    no_rekam_medis: no_rekam_medis || "",
-    golongan_darah: golongan_darah || "",
-  });
-
-  addActivity(`Data ibu ${newIbu.nama} ditambahkan.`);
-  return res.status(201).json(newIbu);
 };
 
-const updateIbu = (req, res) => {
-  const { id } = req.params;
-  const {
-    nama,
-    tanggal_lahir,
-    nama_suami,
-    alamat,
-    no_hp,
-    nik,
-    no_jkn,
-    no_rekam_medis,
-    golongan_darah,
-  } = req.body;
+// CREATE
+const CreateDataIbu = async (req, res, next) => {
+  try {
+    const {
+      nama,
+      tanggal_lahir,
+      nama_suami,
+      alamat,
+      no_hp,
+      nik,
+      no_jkn,
+      no_rekam_medis,
+      golongan_darah,
+    } = req.body;
 
-  if (!nama || !tanggal_lahir || !nik) {
-    return res.status(400).json({
-      message: "Field nama, tanggal_lahir, dan nik wajib diisi.",
+    if (!nama || !tanggal_lahir || !nik) {
+      return res.status(400).json({
+        status: "error",
+        message: "Field nama, tanggal_lahir, dan nik wajib diisi",
+      });
+    }
+
+    const query = `
+      INSERT INTO ibu 
+      (nama, tanggal_lahir, nama_suami, alamat, no_hp, nik, no_jkn, no_rekam_medis, golongan_darah)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      nama,
+      tanggal_lahir,
+      nama_suami || "",
+      alamat || "",
+      no_hp || "",
+      nik,
+      no_jkn || "",
+      no_rekam_medis || "",
+      golongan_darah || "",
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data ibu",
     });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedIbu = updateItem("ibu", id, {
-    nama,
-    tanggal_lahir,
-    nama_suami: nama_suami || "",
-    alamat: alamat || "",
-    no_hp: no_hp || "",
-    nik,
-    no_jkn: no_jkn || "",
-    no_rekam_medis: no_rekam_medis || "",
-    golongan_darah: golongan_darah || "",
-  });
-
-  if (!updatedIbu) {
-    return res.status(404).json({ message: "Data ibu tidak ditemukan." });
-  }
-
-  addActivity(`Data ibu ${updatedIbu.nama} diperbarui.`);
-  return res.json(updatedIbu);
 };
 
-const deleteIbu = (req, res) => {
-  const { id } = req.params;
-  const deletedIbu = deleteItem("ibu", id);
+// UPDATE
+const UpdateDataIbu = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedIbu) {
-    return res.status(404).json({ message: "Data ibu tidak ditemukan." });
+    const {
+      nama,
+      tanggal_lahir,
+      nama_suami,
+      alamat,
+      no_hp,
+      nik,
+      no_jkn,
+      no_rekam_medis,
+      golongan_darah,
+    } = req.body;
+
+    if (!nama || !tanggal_lahir || !nik) {
+      return res.status(400).json({
+        status: "error",
+        message: "Field nama, tanggal_lahir, dan nik wajib diisi",
+      });
+    }
+
+    const query = `
+      UPDATE ibu 
+      SET nama=?, tanggal_lahir=?, nama_suami=?, alamat=?, no_hp=?, nik=?, no_jkn=?, no_rekam_medis=?, golongan_darah=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      nama,
+      tanggal_lahir,
+      nama_suami || "",
+      alamat || "",
+      no_hp || "",
+      nik,
+      no_jkn || "",
+      no_rekam_medis || "",
+      golongan_darah || "",
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data ibu tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data ibu",
+    });
+  } catch (error) {
+    next(error);
   }
+};
 
-  addActivity(`Data ibu ${deletedIbu.nama} dihapus.`);
-  return res.json({ message: "Data ibu berhasil dihapus." });
+// DELETE
+const DeleteDataIbu = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const query = "DELETE FROM ibu WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data ibu tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data ibu",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
-  createIbu,
-  deleteIbu,
-  getIbu,
-  updateIbu,
+  TampilDataIbu,
+  CreateDataIbu,
+  UpdateDataIbu,
+  DeleteDataIbu,
 };

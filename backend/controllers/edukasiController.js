@@ -1,72 +1,119 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
-const { validateIbuRelation } = require("./helpers");
+const db = require("../config/db");
 
-const getEdukasi = (req, res) => {
-  res.json(getItems("edukasi"));
+const TampilDataEdukasi = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM edukasi";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data edukasi",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createEdukasi = (req, res) => {
-  const { ibu_id, materi, tanggal } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+const CreateDataEdukasi = async (req, res, next) => {
+  try {
+    const { ibu_id, materi, tanggal } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    if (!ibu_id || !materi || !tanggal) {
+      return res.status(400).json({
+        status: "error",
+        message: "ibu_id, materi, dan tanggal wajib diisi",
+      });
+    }
+
+    const cekIbu = "SELECT * FROM ibu WHERE id = ?";
+    const [ibu] = await db.execute(cekIbu, [ibu_id]);
+
+    if (ibu.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data ibu tidak ditemukan",
+      });
+    }
+
+    const query = `
+      INSERT INTO edukasi (ibu_id, materi, tanggal)
+      VALUES (?, ?, ?)
+    `;
+
+    await db.execute(query, [ibu_id, materi, tanggal]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data edukasi",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("edukasi", {
-    ibu_id: Number(ibu_id),
-    materi: materi || "",
-    tanggal: tanggal || "",
-  });
-
-  addActivity(`Data edukasi untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updateEdukasi = (req, res) => {
-  const { id } = req.params;
-  const { ibu_id, materi, tanggal } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+const UpdateDataEdukasi = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { ibu_id, materi, tanggal } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    if (!ibu_id || !materi || !tanggal) {
+      return res.status(400).json({
+        status: "error",
+        message: "ibu_id, materi, dan tanggal wajib diisi",
+      });
+    }
+
+    const query = `
+      UPDATE edukasi
+      SET ibu_id = ?, materi = ?, tanggal = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [ibu_id, materi, tanggal, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data edukasi tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data edukasi",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("edukasi", id, {
-    ibu_id: Number(ibu_id),
-    materi: materi || "",
-    tanggal: tanggal || "",
-  });
-
-  if (!updatedItem) {
-    return res.status(404).json({ message: "Data edukasi tidak ditemukan." });
-  }
-
-  addActivity(`Data edukasi untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deleteEdukasi = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("edukasi", id);
+const DeleteDataEdukasi = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res.status(404).json({ message: "Data edukasi tidak ditemukan." });
+    const query = "DELETE FROM edukasi WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data edukasi tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data edukasi",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Data edukasi untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Data edukasi berhasil dihapus." });
 };
 
 module.exports = {
-  createEdukasi,
-  deleteEdukasi,
-  getEdukasi,
-  updateEdukasi,
+  TampilDataEdukasi,
+  CreateDataEdukasi,
+  UpdateDataEdukasi,
+  DeleteDataEdukasi,
 };

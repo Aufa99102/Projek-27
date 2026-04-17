@@ -1,80 +1,159 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
-const getPersalinan = (req, res) => {
-  res.json(getItems("persalinan"));
+// GET ALL
+const TampilDataPersalinan = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM pemeriksaan";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data pemeriksaan",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createPersalinan = (req, res) => {
-  const { ibu_id, jenis_persalinan, komplikasi, bb_bayi, kelainan } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// CREATE
+const CreateDataPersalinan = async (req, res, next) => {
+  try {
+    const {
+      ibu_id,
+      tanggal_kunjungan,
+      usia_kehamilan,
+      tekanan_darah,
+      berat_badan,
+      hasil_pemeriksaan,
+      terapi,
+      keterangan,
+      tanggal_kembali,
+    } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      INSERT INTO pemeriksaan
+      (ibu_id, tanggal_kunjungan, usia_kehamilan, tekanan_darah, berat_badan, hasil_pemeriksaan, terapi, keterangan, tanggal_kembali)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      ibu_id,
+      tanggal_kunjungan || "",
+      usia_kehamilan || "",
+      tekanan_darah || "",
+      berat_badan || "",
+      hasil_pemeriksaan || "",
+      terapi || "",
+      keterangan || "",
+      tanggal_kembali || "",
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("persalinan", {
-    ibu_id: Number(ibu_id),
-    jenis_persalinan: jenis_persalinan || "",
-    komplikasi: komplikasi || "",
-    bb_bayi: bb_bayi || "",
-    kelainan: kelainan || "",
-  });
-
-  addActivity(`Riwayat persalinan untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updatePersalinan = (req, res) => {
-  const { id } = req.params;
-  const { ibu_id, jenis_persalinan, komplikasi, bb_bayi, kelainan } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// UPDATE
+const UpdateDataPersalinan = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const {
+      ibu_id,
+      tanggal_kunjungan,
+      usia_kehamilan,
+      tekanan_darah,
+      berat_badan,
+      hasil_pemeriksaan,
+      terapi,
+      keterangan,
+      tanggal_kembali,
+    } = req.body;
+
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      UPDATE pemeriksaan
+      SET ibu_id=?, tanggal_kunjungan=?, usia_kehamilan=?, tekanan_darah=?, berat_badan=?, hasil_pemeriksaan=?, terapi=?, keterangan=?, tanggal_kembali=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      ibu_id,
+      tanggal_kunjungan || "",
+      usia_kehamilan || "",
+      tekanan_darah || "",
+      berat_badan || "",
+      hasil_pemeriksaan || "",
+      terapi || "",
+      keterangan || "",
+      tanggal_kembali || "",
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data pemeriksaan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("persalinan", id, {
-    ibu_id: Number(ibu_id),
-    jenis_persalinan: jenis_persalinan || "",
-    komplikasi: komplikasi || "",
-    bb_bayi: bb_bayi || "",
-    kelainan: kelainan || "",
-  });
-
-  if (!updatedItem) {
-    return res
-      .status(404)
-      .json({ message: "Riwayat persalinan tidak ditemukan." });
-  }
-
-  addActivity(`Riwayat persalinan untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deletePersalinan = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("persalinan", id);
+// DELETE
+const DeleteDataPersalinan = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res
-      .status(404)
-      .json({ message: "Riwayat persalinan tidak ditemukan." });
+    const query = "DELETE FROM pemeriksaan WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data pemeriksaan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Riwayat persalinan untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Riwayat persalinan berhasil dihapus." });
 };
 
 module.exports = {
-  createPersalinan,
-  deletePersalinan,
-  getPersalinan,
-  updatePersalinan,
+  TampilDataPersalinan,
+  CreateDataPersalinan,
+  UpdateDataPersalinan,
+  DeleteDataPersalinan,
 };

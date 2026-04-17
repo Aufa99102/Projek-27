@@ -1,104 +1,159 @@
-const {
-  addActivity,
-  createItem,
-  deleteItem,
-  getItems,
-  updateItem,
-} = require("../data/store");
+const db = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
-const getPemeriksaan = (req, res) => {
-  res.json(getItems("pemeriksaan"));
+// GET ALL
+const TampilDataPemeriksaan = async (req, res, next) => {
+  try {
+    const query = "SELECT * FROM pemeriksaan";
+    const [rows] = await db.execute(query);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil data pemeriksaan",
+      data: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createPemeriksaan = (req, res) => {
-  const {
-    ibu_id,
-    tanggal_kunjungan,
-    usia_kehamilan,
-    tekanan_darah,
-    berat_badan,
-    hasil_pemeriksaan,
-    terapi,
-    keterangan,
-    tanggal_kembali,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// CREATE
+const CreateDataPemeriksaan = async (req, res, next) => {
+  try {
+    const {
+      ibu_id,
+      tanggal_kunjungan,
+      usia_kehamilan,
+      tekanan_darah,
+      berat_badan,
+      hasil_pemeriksaan,
+      terapi,
+      keterangan,
+      tanggal_kembali,
+    } = req.body;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      INSERT INTO pemeriksaan
+      (ibu_id, tanggal_kunjungan, usia_kehamilan, tekanan_darah, berat_badan, hasil_pemeriksaan, terapi, keterangan, tanggal_kembali)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(query, [
+      ibu_id,
+      tanggal_kunjungan || "",
+      usia_kehamilan || "",
+      tekanan_darah || "",
+      berat_badan || "",
+      hasil_pemeriksaan || "",
+      terapi || "",
+      keterangan || "",
+      tanggal_kembali || "",
+    ]);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Berhasil menambahkan data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newItem = createItem("pemeriksaan", {
-    ibu_id: Number(ibu_id),
-    tanggal_kunjungan: tanggal_kunjungan || "",
-    usia_kehamilan: usia_kehamilan || "",
-    tekanan_darah: tekanan_darah || "",
-    berat_badan: berat_badan || "",
-    hasil_pemeriksaan: hasil_pemeriksaan || "",
-    terapi: terapi || "",
-    keterangan: keterangan || "",
-    tanggal_kembali: tanggal_kembali || "",
-  });
-
-  addActivity(`Pemeriksaan ANC untuk ibu_id ${newItem.ibu_id} ditambahkan.`);
-  return res.status(201).json(newItem);
 };
 
-const updatePemeriksaan = (req, res) => {
-  const { id } = req.params;
-  const {
-    ibu_id,
-    tanggal_kunjungan,
-    usia_kehamilan,
-    tekanan_darah,
-    berat_badan,
-    hasil_pemeriksaan,
-    terapi,
-    keterangan,
-    tanggal_kembali,
-  } = req.body;
-  const relationError = validateIbuRelation(ibu_id);
+// UPDATE
+const UpdateDataPemeriksaan = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (relationError) {
-    return res.status(400).json({ message: relationError });
+    const {
+      ibu_id,
+      tanggal_kunjungan,
+      usia_kehamilan,
+      tekanan_darah,
+      berat_badan,
+      hasil_pemeriksaan,
+      terapi,
+      keterangan,
+      tanggal_kembali,
+    } = req.body;
+
+    const relationError = await validateIbuRelation(ibu_id);
+    if (relationError) {
+      return res.status(400).json({
+        status: "error",
+        message: relationError,
+      });
+    }
+
+    const query = `
+      UPDATE pemeriksaan
+      SET ibu_id=?, tanggal_kunjungan=?, usia_kehamilan=?, tekanan_darah=?, berat_badan=?, hasil_pemeriksaan=?, terapi=?, keterangan=?, tanggal_kembali=?
+      WHERE id=?
+    `;
+
+    const [result] = await db.execute(query, [
+      ibu_id,
+      tanggal_kunjungan || "",
+      usia_kehamilan || "",
+      tekanan_darah || "",
+      berat_badan || "",
+      hasil_pemeriksaan || "",
+      terapi || "",
+      keterangan || "",
+      tanggal_kembali || "",
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data pemeriksaan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil update data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updatedItem = updateItem("pemeriksaan", id, {
-    ibu_id: Number(ibu_id),
-    tanggal_kunjungan: tanggal_kunjungan || "",
-    usia_kehamilan: usia_kehamilan || "",
-    tekanan_darah: tekanan_darah || "",
-    berat_badan: berat_badan || "",
-    hasil_pemeriksaan: hasil_pemeriksaan || "",
-    terapi: terapi || "",
-    keterangan: keterangan || "",
-    tanggal_kembali: tanggal_kembali || "",
-  });
-
-  if (!updatedItem) {
-    return res.status(404).json({ message: "Data pemeriksaan tidak ditemukan." });
-  }
-
-  addActivity(`Pemeriksaan ANC untuk ibu_id ${updatedItem.ibu_id} diperbarui.`);
-  return res.json(updatedItem);
 };
 
-const deletePemeriksaan = (req, res) => {
-  const { id } = req.params;
-  const deletedItem = deleteItem("pemeriksaan", id);
+// DELETE
+const DeleteDataPemeriksaan = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  if (!deletedItem) {
-    return res.status(404).json({ message: "Data pemeriksaan tidak ditemukan." });
+    const query = "DELETE FROM pemeriksaan WHERE id = ?";
+    const [result] = await db.execute(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data pemeriksaan tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil delete data pemeriksaan",
+    });
+  } catch (error) {
+    next(error);
   }
-
-  addActivity(`Pemeriksaan ANC untuk ibu_id ${deletedItem.ibu_id} dihapus.`);
-  return res.json({ message: "Data pemeriksaan berhasil dihapus." });
 };
 
 module.exports = {
-  createPemeriksaan,
-  deletePemeriksaan,
-  getPemeriksaan,
-  updatePemeriksaan,
+  TampilDataPemeriksaan,
+  CreateDataPemeriksaan,
+  UpdateDataPemeriksaan,
+  DeleteDataPemeriksaan,
 };

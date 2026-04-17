@@ -1,16 +1,16 @@
 const express = require("express");
 const {
-  createRencana,
-  deleteRencana,
-  getRencana,
-  updateRencana,
+  TampilDataRencana,
+  CreateDataRencana,
+  UpdateDataRencana,
+  DeleteDataRencana,
 } = require("../controllers/rencanaController");
 
 const router = express.Router();
 
-router.get("/", getRencana);
-router.post("/", createRencana);
-router.put("/:id", updateRencana);
-router.delete("/:id", deleteRencana);
+router.get("/", TampilDataRencana);
+router.post("/", CreateDataRencana);
+router.put("/:id", UpdateDataRencana);
+router.delete("/:id", DeleteDataRencana);
 
 module.exports = router;

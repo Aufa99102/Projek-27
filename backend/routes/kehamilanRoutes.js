@@ -1,16 +1,17 @@
 const express = require("express");
+
 const {
-  createKehamilan,
-  deleteKehamilan,
-  getKehamilan,
-  updateKehamilan,
+  TampilDataKehamilan,
+  CreateDataKehamilan,
+  UpdateDataKehamilan,
+  DeleteDataKehamilan,
 } = require("../controllers/kehamilanController");
 
 const router = express.Router();
 
-router.get("/", getKehamilan);
-router.post("/", createKehamilan);
-router.put("/:id", updateKehamilan);
-router.delete("/:id", deleteKehamilan);
+router.get("/", TampilDataKehamilan);
+router.post("/", CreateDataKehamilan);
+router.put("/:id", UpdateDataKehamilan);
+router.delete("/:id", DeleteDataKehamilan);
 
 module.exports = router;
