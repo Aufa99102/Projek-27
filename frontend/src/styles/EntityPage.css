@@ -1,0 +1,140 @@
+.entity-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #f56eb8;
+}
+
+.page-header p:last-child {
+  margin-bottom: 0;
+  color: #f585e2;
+}
+
+.entity-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  gap: 1.5rem;
+}
+
+.panel-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 185, 228, 0.08);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 18px 34px rgba(16, 52, 58, 0.08);
+}
+
+.panel-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-heading h3 {
+  margin: 0;
+}
+
+.data-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-group span {
+  font-weight: 600;
+  color: #224852;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #d0dcdf;
+  border-radius: 14px;
+  background: #fbfefd;
+  color: #16313b;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table-controls {
+  margin-bottom: 1rem;
+}
+
+.filter-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8f4e72;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #e2ecee;
+  vertical-align: top;
+}
+
+.data-table th {
+  color: #315b63;
+  background: #f3f8f9;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.table-button.edit {
+  background: #e8f4ff;
+  color: #1e5f96;
+}
+
+.table-button.delete {
+  background: #fff1f1;
+  color: #a03d3d;
+}
+
+@media (max-width: 1200px) {
+  .entity-grid {
+    grid-template-columns: 1fr;
+  }
+}
