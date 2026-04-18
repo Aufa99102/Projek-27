@@ -1,10 +1,10 @@
-const db = require("../config/db");
+const {db} = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
 // GET ALL
 const TampilDataPemeriksaan = async (req, res, next) => {
   try {
-    const query = "SELECT * FROM pemeriksaan";
+    const query = "SELECT * FROM pemeriksaan_anc";
     const [rows] = await db.execute(query);
 
     return res.status(200).json({
@@ -41,7 +41,7 @@ const CreateDataPemeriksaan = async (req, res, next) => {
     }
 
     const query = `
-      INSERT INTO pemeriksaan
+      INSERT INTO pemeriksaan_anc
       (ibu_id, tanggal_kunjungan, usia_kehamilan, tekanan_darah, berat_badan, hasil_pemeriksaan, terapi, keterangan, tanggal_kembali)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
@@ -93,7 +93,7 @@ const UpdateDataPemeriksaan = async (req, res, next) => {
     }
 
     const query = `
-      UPDATE pemeriksaan
+      UPDATE pemeriksaan_anc
       SET ibu_id=?, tanggal_kunjungan=?, usia_kehamilan=?, tekanan_darah=?, berat_badan=?, hasil_pemeriksaan=?, terapi=?, keterangan=?, tanggal_kembali=?
       WHERE id=?
     `;
@@ -132,7 +132,7 @@ const DeleteDataPemeriksaan = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const query = "DELETE FROM pemeriksaan WHERE id = ?";
+    const query = "DELETE FROM pemeriksaan_anc WHERE id = ?";
     const [result] = await db.execute(query, [id]);
 
     if (result.affectedRows === 0) {

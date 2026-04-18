@@ -1,10 +1,10 @@
-const { pool } = require("../config/db");
+const { db } = require("../config/db");
 
 const getDashboard = async (req, res, next) => {
   try {
-    const [ibu] = await pool.execute("SELECT COUNT(*) as total FROM ibu");
-    const [pemeriksaan] = await pool.execute("SELECT COUNT(*) as total FROM pemeriksaan");
-    const [usg] = await pool.execute("SELECT COUNT(*) as total FROM usg");
+    const [ibu] = await db.execute("SELECT COUNT(*) as total FROM ibu");
+    const [pemeriksaan] = await db.execute("SELECT COUNT(*) as total FROM pemeriksaan_anc");
+    const [usg] = await db.execute("SELECT COUNT(*) as total FROM usg");
 
     return res.status(200).json({
       status: "success",

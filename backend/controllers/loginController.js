@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const {db} = require("../config/db");
 
 const login = async (req, res, next) => {
   try {

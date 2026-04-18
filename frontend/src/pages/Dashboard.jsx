@@ -16,7 +16,12 @@ function Dashboard() {
     const loadDashboard = async () => {
       try {
         const data = await fetchJson("/dashboard");
-        setSummary(data);
+        setSummary({
+          total_ibu: data.total_ibu ?? 0,
+          total_pemeriksaan: data.total_pemeriksaan ?? 0,
+          total_usg: data.total_usg ?? 0,
+          recent_activity: data.recent_activity ?? [], // ✅ fallback to empty array
+        });
       } catch (requestError) {
         setError(requestError.message);
       } finally {

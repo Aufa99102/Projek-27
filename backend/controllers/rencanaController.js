@@ -1,10 +1,10 @@
-const db = require("../config/db");
+const {db} = require("../config/db");
 const { normalizeArrayField, validateIbuRelation } = require("./helpers");
 
 // GET ALL
 const TampilDataRencana = async (req, res, next) => {
   try {
-    const query = "SELECT * FROM rencana";
+    const query = "SELECT * FROM rencana_persalinan";
     const [rows] = await db.execute(query);
 
     return res.status(200).json({
@@ -40,7 +40,7 @@ const CreateDataRencana = async (req, res, next) => {
     const donor = normalizeArrayField(calon_donor).join(",");
 
     const query = `
-      INSERT INTO rencana
+      INSERT INTO rencana_persalinan
       (ibu_id, penolong, tempat, pendamping, transportasi, calon_donor)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
@@ -88,7 +88,7 @@ const UpdateDataRencana = async (req, res, next) => {
     const donor = normalizeArrayField(calon_donor).join(",");
 
     const query = `
-      UPDATE rencana
+      UPDATE rencana_persalinan
       SET ibu_id=?, penolong=?, tempat=?, pendamping=?, transportasi=?, calon_donor=?
       WHERE id=?
     `;
@@ -124,7 +124,7 @@ const DeleteDataRencana = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const query = "DELETE FROM rencana WHERE id = ?";
+    const query = "DELETE FROM rencana_persalinan WHERE id = ?";
     const [result] = await db.execute(query, [id]);
 
     if (result.affectedRows === 0) {

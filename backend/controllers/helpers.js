@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const {db} = require("../config/db");
 
 // Normalisasi array (tetap dipakai, ini bagus 👍)
 const normalizeArrayField = (value) => {

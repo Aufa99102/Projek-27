@@ -40,8 +40,8 @@ function EntityPage({
       }
 
       const [recordResponse, ibuResponse] = await Promise.all(requests);
-      setRecords(recordResponse);
-      setIbuOptions(ibuResponse || []);
+      setRecords(recordResponse.data || []);
+      setIbuOptions(ibuResponse?.data || []);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
