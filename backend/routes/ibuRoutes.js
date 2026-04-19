@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-  TampilDataIbu,
+  GetDataIbu,
   CreateDataIbu,
   UpdateDataIbu,
   DeleteDataIbu,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", TampilDataIbu);
+router.get("/", GetDataIbu);
 router.post("/", CreateDataIbu);
 router.put("/:id", UpdateDataIbu);
 router.delete("/:id", DeleteDataIbu);

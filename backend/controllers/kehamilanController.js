@@ -2,7 +2,7 @@ const {db} = require("../config/db");
 const { normalizeArrayField, validateIbuRelation } = require("./helpers");
 
 // GET ALL
-const TampilDataKehamilan = async (req, res, next) => {
+const GetDataKehamilan = async (req, res, next) => {
   try {
     const query = "SELECT * FROM kehamilan";
     const [rows] = await db.execute(query);
@@ -152,7 +152,7 @@ const DeleteDataKehamilan = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilDataKehamilan,
+  GetDataKehamilan,
   CreateDataKehamilan,
   UpdateDataKehamilan,
   DeleteDataKehamilan,

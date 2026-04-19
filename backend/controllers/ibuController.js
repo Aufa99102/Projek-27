@@ -1,7 +1,7 @@
 const {db} = require("../config/db");
 
 // GET ALL
-const TampilDataIbu = async (req, res, next) => {
+const GetDataIbu = async (req, res, next) => {
   try {
     const query = "SELECT * FROM ibu";
     const [rows] = await db.execute(query);
@@ -149,7 +149,7 @@ const DeleteDataIbu = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilDataIbu,
+  GetDataIbu,
   CreateDataIbu,
   UpdateDataIbu,
   DeleteDataIbu,

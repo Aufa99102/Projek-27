@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  TampilDataRencana,
+  GetDataRencana,
   CreateDataRencana,
   UpdateDataRencana,
   DeleteDataRencana,
@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", TampilDataRencana);
+router.get("/", GetDataRencana);
 router.post("/", CreateDataRencana);
 router.put("/:id", UpdateDataRencana);
 router.delete("/:id", DeleteDataRencana);

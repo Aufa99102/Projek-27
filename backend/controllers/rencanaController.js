@@ -2,7 +2,7 @@ const {db} = require("../config/db");
 const { normalizeArrayField, validateIbuRelation } = require("./helpers");
 
 // GET ALL
-const TampilDataRencana = async (req, res, next) => {
+const GetDataRencana = async (req, res, next) => {
   try {
     const query = "SELECT * FROM rencana_persalinan";
     const [rows] = await db.execute(query);
@@ -144,7 +144,7 @@ const DeleteDataRencana = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilDataRencana,
+  GetDataRencana,
   CreateDataRencana,
   UpdateDataRencana,
   DeleteDataRencana,

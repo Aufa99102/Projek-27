@@ -2,7 +2,7 @@ const {db} = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
 // GET ALL
-const TampilData = async (req, res, next) => {
+const GetDataLab = async (req, res, next) => {
   try {
     const query = "SELECT * FROM lab";
     const [rows] = await db.execute(query);
@@ -18,7 +18,7 @@ const TampilData = async (req, res, next) => {
 };
 
 // CREATE
-const CreateData = async (req, res, next) => {
+const CreateDataLab = async (req, res, next) => {
   try {
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
@@ -53,7 +53,7 @@ const CreateData = async (req, res, next) => {
 };
 
 // UPDATE
-const UpdateData = async (req, res, next) => {
+const UpdateDataLab = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
@@ -98,7 +98,7 @@ const UpdateData = async (req, res, next) => {
 };
 
 // DELETE
-const DeleteData = async (req, res, next) => {
+const DeleteDataLab = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -122,8 +122,8 @@ const DeleteData = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilData,
-  CreateData,
-  UpdateData,
-  DeleteData,
+  GetDataLab,
+  CreateDataLab,
+  UpdateDataLab,
+  DeleteDataLab,
 };

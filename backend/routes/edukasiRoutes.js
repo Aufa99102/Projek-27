@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  TampilDataEdukasi,
+  GetDataEdukasi,
   CreateDataEdukasi,
   UpdateDataEdukasi,
   DeleteDataEdukasi,
@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", TampilDataEdukasi);
+router.get("/", GetDataEdukasi);
 router.post("/", CreateDataEdukasi);
 router.put("/:id", UpdateDataEdukasi);
 router.delete("/:id", DeleteDataEdukasi);

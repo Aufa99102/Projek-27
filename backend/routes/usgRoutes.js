@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  TampilDataUsg,  
+  GetDataUsg,  
   CreateDataUsg,
   UpdateDataUsg,
   DeleteDataUsg,
@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", TampilDataUsg);
+router.get("/", GetDataUsg);
 router.post("/", CreateDataUsg);
 router.put("/:id", UpdateDataUsg);
 router.delete("/:id", DeleteDataUsg);

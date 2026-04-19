@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-  TampilDataKehamilan,
+  GetDataKehamilan,
   CreateDataKehamilan,
   UpdateDataKehamilan,
   DeleteDataKehamilan,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.get("/", TampilDataKehamilan);
+router.get("/", GetDataKehamilan);
 router.post("/", CreateDataKehamilan);
 router.put("/:id", UpdateDataKehamilan);
 router.delete("/:id", DeleteDataKehamilan);

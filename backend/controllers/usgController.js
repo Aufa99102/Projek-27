@@ -2,7 +2,7 @@ const {db} = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
 // GET ALL
-const TampilDataUsg = async (req, res, next) => {
+const GetDataUsg = async (req, res, next) => {
   try {
     const query = "SELECT * FROM usg";
     const [rows] = await db.execute(query);
@@ -144,7 +144,7 @@ const DeleteDataUsg = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilDataUsg,
+  GetDataUsg,
   CreateDataUsg,
   UpdateDataUsg,
   DeleteDataUsg,

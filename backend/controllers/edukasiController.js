@@ -1,6 +1,6 @@
 const {db} = require("../config/db");
 
-const TampilDataEdukasi = async (req, res, next) => {
+const GetDataEdukasi = async (req, res, next) => {
   try {
     const query = "SELECT * FROM edukasi";
     const [rows] = await db.execute(query);
@@ -112,7 +112,7 @@ const DeleteDataEdukasi = async (req, res, next) => {
 };
 
 module.exports = {
-  TampilDataEdukasi,
+  GetDataEdukasi,
   CreateDataEdukasi,
   UpdateDataEdukasi,
   DeleteDataEdukasi,
