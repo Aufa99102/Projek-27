@@ -11,7 +11,6 @@ const persalinanRoutes = require("./routes/persalinanRoutes");
 const rencanaRoutes = require("./routes/rencanaRoutes");
 const pemeriksaanRoutes = require("./routes/pemeriksaanRoutes");
 const usgRoutes = require("./routes/usgRoutes");
-const edukasiRoutes = require("./routes/edukasiRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
@@ -64,7 +63,6 @@ app.use("/api/persalinan", persalinanRoutes);
 app.use("/api/rencana", rencanaRoutes);
 app.use("/api/pemeriksaan", pemeriksaanRoutes);
 app.use("/api/usg", usgRoutes);
-app.use("/api/edukasi", edukasiRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 const startServer = async (port = PORT) => {

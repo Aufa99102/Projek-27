@@ -11,7 +11,40 @@ const fields = [
   { name: "nik", label: "NIK", required: true },
   { name: "no_jkn", label: "No JKN" },
   { name: "no_rekam_medis", label: "No Rekam Medis" },
-  { name: "golongan_darah", label: "Golongan Darah" },
+
+  // 🔥 Golongan Darah (dropdown)
+  {
+    name: "golongan_darah",
+    label: "Golongan Darah",
+    type: "select",
+    options: ["A", "B", "AB", "O"],
+  },
+
+  
+  { name: "hb", label: "HB", type: "number" },
+  { name: "lila", label: "LILA", type: "number" },
+  { name: "gds", label: "GDS", type: "number" },
+
+  {
+    name: "status_hiv",
+    label: "Status HIV",
+    type: "select",
+    options: ["Non-reaktif", "Reaktif"],
+  },
+
+  {
+    name: "status_sifilis",
+    label: "Status Sifilis",
+    type: "select",
+    options: ["Negatif", "Positif"],
+  },
+
+  {
+    name: "status_ibu",
+    label: "Status Ibu",
+    type: "select",
+    options: ["baru", "lama"],
+  },
 ];
 
 const columns = [
@@ -25,6 +58,14 @@ const columns = [
   { key: "no_jkn", label: "No JKN" },
   { key: "no_rekam_medis", label: "No RM" },
   { key: "golongan_darah", label: "Golda" },
+
+  // 🔥 FIELD BARU
+  { key: "hb", label: "HB" },
+  { key: "lila", label: "LILA" },
+  { key: "gds", label: "GDS" },
+  { key: "status_hiv", label: "HIV" },
+  { key: "status_sifilis", label: "Sifilis" },
+  { key: "status_ibu", label: "Status" },
 ];
 
 function DataIbu() {

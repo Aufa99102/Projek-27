@@ -54,31 +54,23 @@ function EntityPage({
   }, [endpoint, requireIbuOptions]);
 
   const mappedRecords = useMemo(() => {
-    if (!transformRecord) {
-      return records;
-    }
+    if (!transformRecord) return records;
 
     return records.map((record) =>
-      transformRecord(record, {
-        ibuOptions,
-      })
+      transformRecord(record, { ibuOptions })
     );
-  }, [ibuOptions, records, transformRecord]);
+  }, [records, ibuOptions, transformRecord]);
 
   const displayedRecords = useMemo(() => {
-    if (!filterRecords) {
-      return mappedRecords;
-    }
+    if (!filterRecords) return mappedRecords;
 
-    return filterRecords(mappedRecords, {
-      ibuOptions,
-    });
-  }, [filterRecords, ibuOptions, mappedRecords]);
+    return filterRecords(mappedRecords, { ibuOptions });
+  }, [mappedRecords, ibuOptions, filterRecords]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((current) => ({
-      ...current,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
@@ -90,11 +82,11 @@ function EntityPage({
     setSuccessMessage("");
 
     try {
-      const requestMethod = editingId ? "PUT" : "POST";
-      const requestEndpoint = editingId ? `${endpoint}/${editingId}` : endpoint;
+      const method = editingId ? "PUT" : "POST";
+      const url = editingId ? `${endpoint}/${editingId}` : endpoint;
 
-      await fetchJson(requestEndpoint, {
-        method: requestMethod,
+      await fetchJson(url, {
+        method,
         body: JSON.stringify(formData),
       });
 
@@ -104,58 +96,49 @@ function EntityPage({
         editingId ? "Data berhasil diperbarui." : "Data berhasil disimpan."
       );
       await loadData();
-    } catch (requestError) {
-      setError(requestError.message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleEdit = (record) => {
-    const updatedFormData = fields.reduce((accumulator, field) => {
+    const newForm = fields.reduce((acc, field) => {
       const value = record[field.name];
 
       if (Array.isArray(value)) {
-        accumulator[field.name] = value.join(", ");
+        acc[field.name] = value.join(", ");
       } else if (value === null || value === undefined) {
-        accumulator[field.name] = "";
+        acc[field.name] = "";
       } else {
-        accumulator[field.name] = String(value);
+        acc[field.name] = String(value);
       }
 
-      return accumulator;
+      return acc;
     }, {});
 
-    setFormData(updatedFormData);
+    setFormData(newForm);
     setEditingId(record.id);
-    setSuccessMessage("");
     setError("");
+    setSuccessMessage("");
   };
 
-  const handleDelete = async (recordId) => {
-    const isConfirmed = window.confirm("Yakin ingin menghapus data ini?");
-
-    if (!isConfirmed) {
-      return;
-    }
-
-    setError("");
-    setSuccessMessage("");
+  const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus data ini?")) return;
 
     try {
-      await fetchJson(`${endpoint}/${recordId}`, {
-        method: "DELETE",
-      });
+      await fetchJson(`${endpoint}/${id}`, { method: "DELETE" });
 
-      if (editingId === recordId) {
+      if (editingId === id) {
         setEditingId(null);
         setFormData(buildInitialState(fields));
       }
 
       setSuccessMessage("Data berhasil dihapus.");
       await loadData();
-    } catch (requestError) {
-      setError(requestError.message);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -177,38 +160,37 @@ function EntityPage({
       </div>
 
       <div className="entity-grid">
+        {/* FORM */}
         <div className="panel-card">
           <div className="panel-heading">
             <h3>{editingId ? "Edit Data" : "Form Input"}</h3>
-            {editingId ? (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleCancelEdit}
-              >
+            {editingId && (
+              <button onClick={handleCancelEdit} className="secondary-button">
                 Batal Edit
               </button>
-            ) : null}
+            )}
           </div>
-          {error ? <div className="alert error">{error}</div> : null}
-          {successMessage ? <div className="alert success">{successMessage}</div> : null}
+
+          {error && <div className="alert error">{error}</div>}
+          {successMessage && <div className="alert success">{successMessage}</div>}
 
           <form className="data-form" onSubmit={handleSubmit}>
             {fields.map((field) => {
+              // SELECT IBU
               if (field.type === "select-ibu") {
                 return (
                   <label key={field.name} className="form-group">
                     <span>{field.label}</span>
                     <select
                       name={field.name}
-                      value={formData[field.name]}
+                      value={formData[field.name] || ""}
                       onChange={handleChange}
                       required={field.required}
                     >
                       <option value="">Pilih ibu</option>
                       {ibuOptions.map((ibu) => (
                         <option key={ibu.id} value={ibu.id}>
-                          {ibu.nama} - RM {ibu.no_rekam_medis || "-"}
+                          {ibu.nama}
                         </option>
                       ))}
                     </select>
@@ -216,130 +198,110 @@ function EntityPage({
                 );
               }
 
+              // TEXTAREA
               if (field.type === "textarea") {
                 return (
                   <label key={field.name} className="form-group">
                     <span>{field.label}</span>
                     <textarea
                       name={field.name}
-                      value={formData[field.name]}
+                      value={formData[field.name] || ""}
                       onChange={handleChange}
-                      placeholder={field.placeholder || ""}
                       required={field.required}
-                      rows="4"
                     />
                   </label>
                 );
               }
 
+              // 🔥 FIX SELECT (SUPPORT STRING & OBJECT)
               if (field.type === "select" && field.options) {
                 return (
                   <label key={field.name} className="form-group">
                     <span>{field.label}</span>
                     <select
                       name={field.name}
-                      value={formData[field.name]}
+                      value={formData[field.name] || ""}
                       onChange={handleChange}
                       required={field.required}
                     >
                       <option value="">Pilih</option>
-                      {field.options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
+                      {field.options.map((option) => {
+                        if (typeof option === "string") {
+                          return (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          );
+                        }
+
+                        return (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        );
+                      })}
                     </select>
                   </label>
                 );
               }
 
+              // INPUT DEFAULT
               return (
                 <label key={field.name} className="form-group">
                   <span>{field.label}</span>
                   <input
                     type={field.type || "text"}
                     name={field.name}
-                    value={formData[field.name]}
+                    value={formData[field.name] || ""}
                     onChange={handleChange}
-                    placeholder={field.placeholder || ""}
                     required={field.required}
                   />
                 </label>
               );
             })}
 
-            <button type="submit" className="primary-button" disabled={submitting}>
+            <button type="submit" disabled={submitting} className="primary-button">
               {submitting
-                ? editingId
-                  ? "Menyimpan Perubahan..."
-                  : "Menyimpan..."
+                ? "Menyimpan..."
                 : editingId
-                  ? "Update Data"
-                  : "Simpan Data"}
+                ? "Update Data"
+                : "Simpan Data"}
             </button>
           </form>
         </div>
 
+        {/* TABLE */}
         <div className="panel-card">
           <h3>Daftar Data</h3>
-          {renderTableControls ? (
-            <div className="table-controls">
-              {renderTableControls({
-                records: mappedRecords,
-                displayedRecords,
-                ibuOptions,
-              })}
-            </div>
-          ) : null}
-          {loading ? (
-            <p className="empty-state">Memuat data...</p>
-          ) : displayedRecords.length === 0 ? (
-            <p className="empty-state">Belum ada data tersimpan.</p>
-          ) : (
-            <div className="table-wrapper">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    {columns.map((column) => (
-                      <th key={column.key}>{column.label}</th>
-                    ))}
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayedRecords.map((record) => (
-                    <tr key={record.id}>
-                      {columns.map((column) => {
-                        const value = record[column.key];
-                        const displayValue = Array.isArray(value)
-                          ? value.join(", ")
-                          : value || "-";
 
-                        return <td key={`${record.id}-${column.key}`}>{displayValue}</td>;
-                      })}
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            type="button"
-                            className="table-button edit"
-                            onClick={() => handleEdit(record)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="table-button delete"
-                            onClick={() => handleDelete(record.id)}
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  {columns.map((col) => (
+                    <th key={col.key}>{col.label}</th>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedRecords.map((record) => (
+                  <tr key={record.id}>
+                    {columns.map((col) => (
+                      <td key={col.key}>{record[col.key] || "-"}</td>
+                    ))}
+                    <td>
+                      <button onClick={() => handleEdit(record)}>Edit</button>
+                      <button onClick={() => handleDelete(record.id)}>
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>
