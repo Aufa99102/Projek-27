@@ -1,4 +1,4 @@
-const {db} = require("../config/db");
+const { db } = require("../config/db");
 const { validateIbuRelation } = require("./helpers");
 
 // GET ALL
@@ -40,7 +40,7 @@ const CreateDataLab = async (req, res, next) => {
       hb || "",
       albumin || "",
       hbsag || "",
-      hiv || "",
+      hiv || "Negatif", // ✅ FIX: default ENUM aman
     ]);
 
     return res.status(201).json({
@@ -77,7 +77,7 @@ const UpdateDataLab = async (req, res, next) => {
       hb || "",
       albumin || "",
       hbsag || "",
-      hiv || "",
+      hiv || "Negatif", // ✅ FIX: default ENUM aman
       id,
     ]);
 

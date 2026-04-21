@@ -7,7 +7,17 @@ const fields = [
   { name: "hb", label: "HB" },
   { name: "albumin", label: "Albumin" },
   { name: "hbsag", label: "HBSAG" },
-  { name: "hiv", label: "HIV" },
+
+  // 🔥 HIV dibuat dropdown ENUM
+  {
+    name: "hiv",
+    label: "HIV",
+    type: "select",
+    options: [
+      { value: "Negatif", label: "Negatif" },
+      { value: "Positif", label: "Positif" },
+    ],
+  },
 ];
 
 const columns = [

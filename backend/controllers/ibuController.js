@@ -84,7 +84,7 @@ const CreateDataIbu = async (req, res, next) => {
       lila ?? null,
       gds ?? null,
 
-      status_hiv || "Non-reaktif",
+      status_hiv || "Negatif",
       status_sifilis || "Negatif",
       status_ibu || "baru",
     ]);
@@ -167,7 +167,7 @@ const UpdateDataIbu = async (req, res, next) => {
       lila ?? null,
       gds ?? null,
 
-      status_hiv || "Non-reaktif",
+      status_hiv || "Negatif",
       status_sifilis || "Negatif",
       status_ibu || "baru",
 

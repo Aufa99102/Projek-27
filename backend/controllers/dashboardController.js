@@ -3,30 +3,18 @@ const { db } = require("../config/db");
 const getDashboard = async (req, res, next) => {
   try {
 
-    // =========================
-    // TOTAL IBU
-    // =========================
     const [ibu] = await db.execute(`
       SELECT COUNT(*) AS total FROM ibu
     `);
 
-    // =========================
-    // TOTAL KUNJUNGAN ANC
-    // =========================
     const [kunjungan] = await db.execute(`
       SELECT COUNT(*) AS total FROM pemeriksaan_anc
     `);
 
-    // =========================
-    // TOTAL USG
-    // =========================
     const [usg] = await db.execute(`
       SELECT COUNT(*) AS total FROM usg
     `);
 
-    // =========================
-    // KUNJUNGAN BULAN INI
-    // =========================
     const [kunjunganBulanIni] = await db.execute(`
       SELECT COUNT(*) AS total
       FROM pemeriksaan_anc
@@ -34,9 +22,6 @@ const getDashboard = async (req, res, next) => {
       AND YEAR(tanggal_kunjungan) = YEAR(CURRENT_DATE())
     `);
 
-    // =========================
-    // IBU BARU BULAN INI
-    // =========================
     const [ibuBaru] = await db.execute(`
       SELECT COUNT(*) AS total
       FROM ibu
@@ -45,9 +30,6 @@ const getDashboard = async (req, res, next) => {
       AND YEAR(created_at) = YEAR(CURRENT_DATE())
     `);
 
-    // =========================
-    // REKAP 6 BULAN IBU
-    // =========================
     const [rekapIbu] = await db.execute(`
       SELECT 
         DATE_FORMAT(created_at, '%Y-%m') AS bulan,
@@ -58,9 +40,6 @@ const getDashboard = async (req, res, next) => {
       ORDER BY bulan ASC
     `);
 
-    // =========================
-    // HIV & SIFILIS STAT
-    // =========================
     const [hiv] = await db.execute(`
       SELECT status_hiv, COUNT(*) AS total
       FROM ibu

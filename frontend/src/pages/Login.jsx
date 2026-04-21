@@ -6,8 +6,13 @@ import "../styles/Login.css";
 function Login() {
   const navigate = useNavigate();
   const session = getSession();
+
+  const [mode, setMode] = useState("login"); // login | register
+
+  const [nama, setNama] = useState("");
   const [email, setEmail] = useState("nakes@kiacare.id");
   const [password, setPassword] = useState("nakes123");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,21 +20,39 @@ function Login() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetchJson("/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
+      // ======================
+      // LOGIN
+      // ======================
+      if (mode === "login") {
+        const res = await fetchJson("/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+        });
 
-      saveSession(response.user);
-      navigate("/dashboard");
-    } catch (requestError) {
-      setError(requestError.message);
+        saveSession(res.user);
+        navigate("/dashboard");
+      }
+
+      // ======================
+      // REGISTER
+      // ======================
+      else {
+        await fetchJson("/auth/register", {
+          method: "POST",
+          body: JSON.stringify({ nama, email, password }),
+        });
+
+        setMode("login");
+        setError("Registrasi berhasil, silakan login");
+      }
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -38,45 +61,53 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <p className="login-overline">Maternal Health Record</p>
-        <h1>KIA Care - Nakes System</h1>
-        <p className="login-description">
-          Sistem pencatatan digital Buku KIA untuk bidan dan dokter.
-        </p>
+        <h1>{mode === "login" ? "Login" : "Register"}</h1>
 
-        <div className="credential-box">
-          <strong>Akun demo nakes</strong>
-          <span>Email: nakes@kiacare.id</span>
-          <span>Password: nakes123</span>
-        </div>
+        {error && <div className="alert error">{error}</div>}
 
-        {error ? <div className="alert error">{error}</div> : null}
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <label className="form-group">
-            <span>Email</span>
+        <form onSubmit={handleSubmit}>
+          {mode === "register" && (
             <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Nama"
+              value={nama}
+              onChange={(e) => setNama(e.target.value)}
               required
             />
-          </label>
+          )}
 
-          <label className="form-group">
-            <span>Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
-          </label>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-          <button type="submit" className="primary-button" disabled={loading}>
-            {loading ? "Memproses..." : "Masuk sebagai Nakes"}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button type="submit" disabled={loading} className="primary-button">
+            {loading
+              ? "Loading..."
+              : mode === "login"
+              ? "Login"
+              : "Register"}
           </button>
         </form>
+
+        <p
+          style={{ cursor: "pointer", marginTop: "10px", color: "#2f7d72" }}
+          onClick={() => setMode(mode === "login" ? "register" : "login")}
+        >
+          {mode === "login"
+            ? "Belum punya akun? Register"
+            : "Sudah punya akun? Login"}
+        </p>
       </div>
     </div>
   );

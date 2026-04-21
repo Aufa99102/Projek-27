@@ -1,4 +1,4 @@
-const {db} = require("../config/db");
+const { db } = require("../config/db");
 const { normalizeArrayField, validateIbuRelation } = require("./helpers");
 
 // GET ALL
@@ -49,7 +49,7 @@ const CreateDataRencana = async (req, res, next) => {
       ibu_id,
       penolong || "",
       tempat || "",
-      pendamping || "",
+      pendamping || "keluarga", // 🔥 FIX ENUM SAFE
       transportasi || "",
       donor,
     ]);
@@ -97,7 +97,7 @@ const UpdateDataRencana = async (req, res, next) => {
       ibu_id,
       penolong || "",
       tempat || "",
-      pendamping || "",
+      pendamping || "keluarga", // 🔥 FIX ENUM SAFE
       transportasi || "",
       donor,
       id,

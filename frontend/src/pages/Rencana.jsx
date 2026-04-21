@@ -6,7 +6,19 @@ const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
   { name: "penolong", label: "Penolong" },
   { name: "tempat", label: "Tempat" },
-  { name: "pendamping", label: "Pendamping" },
+
+  // 🔥 DIUBAH MENJADI DROPDOWN
+  {
+    name: "pendamping",
+    label: "Pendamping",
+    type: "select",
+    options: [
+      { value: "keluarga", label: "Keluarga" },
+      { value: "suami", label: "Suami" },
+    ],
+    required: true,
+  },
+
   { name: "transportasi", label: "Transportasi" },
   {
     name: "calon_donor",
