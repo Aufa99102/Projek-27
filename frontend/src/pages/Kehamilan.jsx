@@ -17,26 +17,29 @@ const fields = [
   { name: "imt", label: "IMT" },
 ];
 
-const columns = [
-  { key: "id", label: "ID" },
-  { key: "ibu_nama", label: "Klien" },
-  { key: "usia_kehamilan_label", label: "Usia Kehamilan" },
-  { key: "kategori_kehamilan_label", label: "Kategori" },
-  { key: "trimester_label", label: "Trimester" },
-  { key: "hpht", label: "HPHT" },
-  { key: "hpl", label: "HPL" },
-  { key: "jarak_kehamilan", label: "Jarak" },
-  { key: "status_imunisasi", label: "Imunisasi" },
-  { key: "riwayat_penyakit", label: "Riwayat Penyakit" },
-  { key: "bb_sebelum_hamil", label: "BB Awal" },
-  { key: "imt", label: "IMT" },
-];
-
-const FILTER_OPTIONS = [
+const KATEGORI_OPTIONS = [
   { value: "all", label: "Semua" },
   { value: "kurang_dari_3_bulan", label: "< 3 Bulan" },
   { value: "kurang_dari_7_bulan", label: "< 7 Bulan" },
-  { value: "tujuh_bulan_ke_atas", label: "7+ Bulan" },
+  { value: "tujuh_bulan_ke_atas", label: ">= 7 Bulan" },
+];
+
+const STATUS_IBU_OPTIONS = [
+  { value: "all", label: "Semua Status" },
+  { value: "baru", label: "Ibu hamil baru" },
+  { value: "lama", label: "Ibu hamil lama" },
+];
+
+const STATUS_HIV_OPTIONS = [
+  { value: "all", label: "Semua Status" },
+  { value: "Reaktif", label: "Reaktif" },
+  { value: "Non-reaktif", label: "Non-reaktif" },
+];
+
+const STATUS_SIFILIS_OPTIONS = [
+  { value: "all", label: "Semua Status" },
+  { value: "Positif", label: "Positif" },
+  { value: "Negatif", label: "Negatif" },
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -130,8 +133,127 @@ const tentukanTrimester = (usiaKehamilanMinggu) => {
   };
 };
 
+const renderBadge = (label, tone) => (
+  <span className={`status-badge ${tone}`}>{label}</span>
+);
+
+const getStatusIbuLabel = (value) => {
+  if (value === "baru") {
+    return "Ibu hamil baru";
+  }
+
+  if (value === "lama") {
+    return "Ibu hamil lama";
+  }
+
+  return value || "Belum diketahui";
+};
+
+const normalizeHivStatus = (value) => {
+  if (value === "Negatif") {
+    return "Non-reaktif";
+  }
+
+  return value || "";
+};
+
+const getKategoriTone = (value) => {
+  if (value === "kurang_dari_3_bulan") {
+    return "info";
+  }
+
+  if (value === "kurang_dari_7_bulan") {
+    return "warning";
+  }
+
+  if (value === "tujuh_bulan_ke_atas") {
+    return "success";
+  }
+
+  return "neutral";
+};
+
 function Kehamilan() {
-  const [kategoriFilter, setKategoriFilter] = useState("all");
+  const [filters, setFilters] = useState({
+    kategori: "all",
+    statusIbu: "all",
+    statusHiv: "all",
+    statusSifilis: "all",
+  });
+
+  const columns = [
+    { key: "id", label: "ID" },
+    { key: "ibu_nama", label: "Klien" },
+    { key: "usia_kehamilan_label", label: "Usia Kehamilan" },
+    {
+      key: "kategori_kehamilan_label",
+      label: "Kategori",
+      render: (record) =>
+        renderBadge(
+          record.kategori_kehamilan_label,
+          getKategoriTone(record.kategori_kehamilan)
+        ),
+    },
+    { key: "trimester_label", label: "Trimester" },
+    {
+      key: "status_ibu",
+      label: "Status Ibu",
+      render: (record) =>
+        renderBadge(
+          getStatusIbuLabel(record.status_ibu),
+          record.status_ibu === "baru" ? "info" : "neutral"
+        ),
+    },
+    {
+      key: "status_hiv",
+      label: "HIV",
+      render: (record) =>
+        renderBadge(
+          record.status_hiv || "Belum diisi",
+          record.status_hiv
+            ? record.status_hiv === "Reaktif"
+              ? "danger"
+              : "success"
+            : "neutral"
+        ),
+    },
+    {
+      key: "status_sifilis",
+      label: "Sifilis",
+      render: (record) =>
+        renderBadge(
+          record.status_sifilis || "Belum diisi",
+          record.status_sifilis
+            ? record.status_sifilis === "Positif"
+              ? "danger"
+              : "success"
+            : "neutral"
+        ),
+    },
+    { key: "hpht", label: "HPHT" },
+    { key: "hpl", label: "HPL" },
+    { key: "jarak_kehamilan", label: "Jarak" },
+    { key: "status_imunisasi", label: "Imunisasi" },
+    { key: "riwayat_penyakit", label: "Riwayat Penyakit" },
+    { key: "bb_sebelum_hamil", label: "BB Awal" },
+    { key: "imt", label: "IMT" },
+  ];
+
+  const updateFilter = (name, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      kategori: "all",
+      statusIbu: "all",
+      statusHiv: "all",
+      statusSifilis: "all",
+    });
+  };
 
   return (
     <div className="page-theme kehamilan-page">
@@ -152,6 +274,9 @@ function Kehamilan() {
           return {
             ...record,
             ibu_nama: ibu ? ibu.nama : `Ibu ID ${record.ibu_id}`,
+            status_ibu: ibu?.status_ibu || "",
+            status_hiv: normalizeHivStatus(ibu?.status_hiv),
+            status_sifilis: ibu?.status_sifilis || "",
             ...usiaKehamilan,
             ...kategoriKehamilan,
             ...trimesterInfo,
@@ -159,34 +284,106 @@ function Kehamilan() {
         }}
         filterRecords={(records) =>
           records.filter((record) =>
-            kategoriFilter === "all"
-              ? true
-              : record.kategori_kehamilan === kategoriFilter
+            (filters.kategori === "all" ||
+              record.kategori_kehamilan === filters.kategori) &&
+            (filters.statusIbu === "all" ||
+              record.status_ibu === filters.statusIbu) &&
+            (filters.statusHiv === "all" ||
+              record.status_hiv === filters.statusHiv) &&
+            (filters.statusSifilis === "all" ||
+              record.status_sifilis === filters.statusSifilis)
           )
         }
         renderTableControls={({ records, displayedRecords }) => (
           <div className="trimester-filter-card">
-            <div>
-              <p className="filter-label">Filter kehamilan berdasarkan lama kehamilan</p>
+            <div className="trimester-filter-summary">
+              <p className="filter-label">Multi-filter data kehamilan</p>
               <strong>
-                {displayedRecords.length} dari {records.length} klien tampil
+                {displayedRecords.length} dari {records.length} data tampil
               </strong>
             </div>
+            <div className="trimester-filter-grid">
+              <label className="trimester-filter-field">
+                <span>Lama Kehamilan</span>
+                <select
+                  value={filters.kategori}
+                  onChange={(event) => updateFilter("kategori", event.target.value)}
+                >
+                  {KATEGORI_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="trimester-filter-field">
+                <span>Status Ibu</span>
+                <select
+                  value={filters.statusIbu}
+                  onChange={(event) => updateFilter("statusIbu", event.target.value)}
+                >
+                  {STATUS_IBU_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="trimester-filter-field">
+                <span>Status HIV</span>
+                <select
+                  value={filters.statusHiv}
+                  onChange={(event) => updateFilter("statusHiv", event.target.value)}
+                >
+                  {STATUS_HIV_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="trimester-filter-field">
+                <span>Status Sifilis</span>
+                <select
+                  value={filters.statusSifilis}
+                  onChange={(event) =>
+                    updateFilter("statusSifilis", event.target.value)
+                  }
+                >
+                  {STATUS_SIFILIS_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
             <div className="trimester-filter-group">
-              {FILTER_OPTIONS.map((option) => (
+              {KATEGORI_OPTIONS.slice(1).map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   className={
-                    kategoriFilter === option.value
+                    filters.kategori === option.value
                       ? "trimester-filter-button active"
                       : "trimester-filter-button"
                   }
-                  onClick={() => setKategoriFilter(option.value)}
+                  onClick={() => updateFilter("kategori", option.value)}
                 >
                   {option.label}
                 </button>
               ))}
+              <button
+                type="button"
+                className="trimester-filter-button reset"
+                onClick={resetFilters}
+              >
+                Reset Filter
+              </button>
             </div>
           </div>
         )}

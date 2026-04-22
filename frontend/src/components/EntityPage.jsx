@@ -149,6 +149,22 @@ function EntityPage({
     setSuccessMessage("");
   };
 
+  const renderCellValue = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    return value;
+  };
+
+  const getCellContent = (column, record) => {
+    if (typeof column.render === "function") {
+      return column.render(record);
+    }
+
+    return renderCellValue(record[column.key]);
+  };
+
   return (
     <section className="entity-page">
       <div className="page-header">
@@ -274,34 +290,60 @@ function EntityPage({
         <div className="panel-card">
           <h3>Daftar Data</h3>
 
+          {renderTableControls ? (
+            <div className="table-controls">
+              {renderTableControls({
+                records: mappedRecords,
+                displayedRecords,
+                ibuOptions,
+              })}
+            </div>
+          ) : null}
+
           {loading ? (
             <p>Loading...</p>
+          ) : displayedRecords.length === 0 ? (
+            <p>Belum ada data yang dapat ditampilkan.</p>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  {columns.map((col) => (
-                    <th key={col.key}>{col.label}</th>
-                  ))}
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedRecords.map((record) => (
-                  <tr key={record.id}>
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
                     {columns.map((col) => (
-                      <td key={col.key}>{record[col.key] || "-"}</td>
+                      <th key={col.key}>{col.label}</th>
                     ))}
-                    <td>
-                      <button onClick={() => handleEdit(record)}>Edit</button>
-                      <button onClick={() => handleDelete(record.id)}>
-                        Hapus
-                      </button>
-                    </td>
+                    <th>Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {displayedRecords.map((record) => (
+                    <tr key={record.id}>
+                      {columns.map((col) => (
+                        <td key={col.key}>{getCellContent(col, record)}</td>
+                      ))}
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            type="button"
+                            className="table-button edit"
+                            onClick={() => handleEdit(record)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="table-button delete"
+                            onClick={() => handleDelete(record.id)}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
