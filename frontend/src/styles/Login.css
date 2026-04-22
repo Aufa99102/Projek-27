@@ -3,7 +3,9 @@
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #e8f3f1, #f7f9fb);
+  background:
+    radial-gradient(circle at top left, rgba(255, 182, 213, 0.35), transparent 30%),
+    linear-gradient(135deg, #fff2f9, #ffdcecab);
 }
 
 /* CARD GLASS EFFECT */
@@ -11,10 +13,10 @@
   width: min(100%, 460px);
   padding: 2.2rem;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(14px);
-  box-shadow: 0 30px 60px rgba(16, 45, 52, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 30px 60px rgba(188, 72, 133, 0.16);
+  border: 1px solid rgba(239, 164, 200, 0.45);
   transition: transform 0.2s ease;
 }
 
@@ -25,7 +27,7 @@
 /* TITLE */
 .login-card h1 {
   margin: 0.35rem 0 0.85rem;
-  color: #15343c;
+  color: var(--pink-text);
   font-size: 1.7rem;
   font-weight: 800;
   letter-spacing: -0.3px;
@@ -36,7 +38,7 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #2aa79a;
+  color: #c34c89;
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -45,7 +47,7 @@
 .login-description {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #5f7b80;
+  color: var(--pink-muted);
   font-size: 0.92rem;
   line-height: 1.4;
 }
@@ -57,9 +59,9 @@
   padding: 1rem;
   margin-bottom: 1.2rem;
   border-radius: 14px;
-  background: linear-gradient(135deg, #e8fbf7, #f1fffd);
-  border: 1px solid #cceee7;
-  color: #1e5e57;
+  background: linear-gradient(135deg, #fff3f9, #ffe3ef);
+  border: 1px solid rgba(228, 103, 154, 0.24);
+  color: #a33b6c;
   font-size: 0.9rem;
 }
 
@@ -74,16 +76,16 @@
   width: 100%;
   padding: 0.9rem 1rem;
   border-radius: 14px;
-  border: 1px solid #d7e5e8;
-  background: #ffffff;
+  border: 1px solid rgba(223, 112, 171, 0.26);
+  background: rgba(255, 255, 255, 0.95);
   outline: none;
   transition: all 0.2s ease;
   font-size: 0.95rem;
 }
 
 .login-form input:focus {
-  border-color: #2aa79a;
-  box-shadow: 0 0 0 4px rgba(42, 167, 154, 0.12);
+  border-color: #e7549c;
+  box-shadow: 0 0 0 4px rgba(231, 84, 156, 0.14);
 }
 
 /* LABEL */
@@ -91,7 +93,7 @@
   display: grid;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: #35585f;
+  color: #874d6d;
   font-weight: 600;
 }
 
@@ -100,7 +102,7 @@
   padding: 0.95rem;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, #1f7a6a, #2aa79a);
+  background: var(--pink-gradient-main);
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -109,7 +111,7 @@
 
 .login-form button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(31, 122, 106, 0.25);
+  box-shadow: 0 14px 28px rgba(188, 72, 133, 0.25);
 }
 
 .login-form button:disabled {
@@ -127,25 +129,25 @@
 }
 
 .alert.error {
-  background: #ffecec;
-  color: #b04141;
-  border: 1px solid #f3bcbc;
+  background: linear-gradient(135deg, #fff0f6, #ffe2ec);
+  color: #af3d6d;
+  border: 1px solid rgba(228, 103, 154, 0.25);
 }
 
 .alert.success {
-  background: #e9fbf5;
-  color: #1d7a63;
-  border: 1px solid #bde7d8;
+  background: linear-gradient(135deg, #fff3fa, #ffe6f1);
+  color: #a53f6d;
+  border: 1px solid rgba(228, 103, 154, 0.22);
 }
 
 /* LINK TOGGLE LOGIN/REGISTER */
 .login-card p {
-  color: #4b6b71;
+  color: var(--pink-muted);
   font-size: 0.9rem;
 }
 
 .login-card p:hover {
-  color: #2aa79a;
+  color: #d14f8e;
 }
 
 /* RESPONSIVE */

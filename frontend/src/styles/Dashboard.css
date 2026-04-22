@@ -16,11 +16,11 @@
 .stat-card,
 .activity-card,
 .category-card {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(18, 48, 59, 0.08);
+  background: var(--pink-gradient-card);
+  border: 1px solid var(--pink-border);
   border-radius: 18px;
   padding: 1rem;
-  box-shadow: 0 10px 24px rgba(16, 52, 58, 0.06);
+  box-shadow: 0 14px 28px rgba(188, 72, 133, 0.08);
 }
 
 .stat-card {
@@ -30,29 +30,29 @@
 
 .stat-card span {
   font-size: 0.82rem;
-  color: #5a6871;
+  color: var(--pink-muted);
 }
 
 .stat-card strong {
   font-size: 2rem;
   line-height: 1;
-  color: #173741;
+  color: var(--pink-text);
 }
 
 .stat-card.neutral {
-  background: linear-gradient(135deg, #ffffff, #f5fafb);
+  background: linear-gradient(135deg, #fff9fc, #ffeef6);
 }
 
 .stat-card.info {
-  background: linear-gradient(135deg, #f4f8ff, #e8f0ff);
+  background: linear-gradient(135deg, #fff1f8, #ffdfea);
 }
 
 .stat-card.success {
-  background: linear-gradient(135deg, #f3fff8, #e5f8ed);
+  background: linear-gradient(135deg, #fff5fb, #ffe6f2);
 }
 
 .stat-card.soft {
-  background: linear-gradient(135deg, #fff8fb, #fff3f8);
+  background: linear-gradient(135deg, #fff7fb, #ffddea);
 }
 
 .dashboard-grid {
@@ -74,13 +74,13 @@
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #7f6574;
+  color: #bd5c8f;
 }
 
 .section-heading h3 {
   margin: 0;
   font-size: 1.05rem;
-  color: #1d3943;
+  color: var(--pink-text);
 }
 
 .summary-split {
@@ -92,14 +92,14 @@
 .summary-panel {
   padding: 0.85rem;
   border-radius: 16px;
-  background: #f9fcfc;
-  border: 1px solid #e4edef;
+  background: linear-gradient(135deg, rgba(255, 249, 252, 0.98), rgba(255, 236, 245, 0.96));
+  border: 1px solid rgba(223, 112, 171, 0.18);
 }
 
 .summary-title {
   margin: 0 0 0.75rem;
   font-weight: 700;
-  color: #35525a;
+  color: #8e4a70;
 }
 
 .summary-list {
@@ -116,7 +116,7 @@
 
 .summary-row strong {
   font-size: 1.15rem;
-  color: #1e3943;
+  color: var(--pink-text);
 }
 
 .dashboard-badge {
@@ -131,23 +131,23 @@
 }
 
 .dashboard-badge.success {
-  background: #e7f8ed;
-  color: #167348;
+  background: linear-gradient(135deg, #ffeaf4, #ffd6e9);
+  color: #b03b6c;
 }
 
 .dashboard-badge.danger {
-  background: #ffe7e7;
-  color: #b42318;
+  background: linear-gradient(135deg, #ffe2ec, #ffcadd);
+  color: #bc2d68;
 }
 
 .dashboard-badge.warning {
-  background: #fff1db;
-  color: #a15a00;
+  background: linear-gradient(135deg, #fff0f6, #ffe0ec);
+  color: #b24b78;
 }
 
 .dashboard-badge.info {
-  background: #e7f1ff;
-  color: #1f5aa6;
+  background: linear-gradient(135deg, #ffeef7, #ffd8ea);
+  color: #c04e87;
 }
 
 .category-grid {
@@ -164,11 +164,11 @@
 
 .category-card strong {
   font-size: 1.8rem;
-  color: #173741;
+  color: var(--pink-text);
 }
 
 .category-card span:last-child {
-  color: #62747b;
+  color: var(--pink-muted);
   font-size: 0.85rem;
 }
 
@@ -180,14 +180,14 @@
 .activity-item {
   padding: 0.85rem 1rem;
   border-radius: 14px;
-  background: #f7fbfb;
-  border: 1px solid #e3ecee;
+  background: linear-gradient(135deg, #fff8fc, #ffeaf4);
+  border: 1px solid rgba(223, 112, 171, 0.18);
 }
 
 .activity-item strong {
   display: block;
   margin-bottom: 0.45rem;
-  color: #1e3943;
+  color: var(--pink-text);
 }
 
 .activity-metrics {
@@ -197,7 +197,7 @@
 }
 
 .activity-metrics span {
-  color: #5d7077;
+  color: var(--pink-muted);
   font-size: 0.9rem;
 }
 

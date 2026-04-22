@@ -1,5 +1,5 @@
 .kehamilan-page .page-header h2 {
-  color: #6a4c20;
+  color: #d64f91;
 }
 
 .trimester-filter-card {
@@ -9,7 +9,7 @@
   gap: 1rem;
   padding: 1rem 1.1rem;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 228, 239, 0.95), rgba(255, 244, 248, 0.92));
+  background: linear-gradient(135deg, rgba(255, 232, 243, 0.98), rgba(255, 244, 249, 0.94));
   border: 1px solid rgba(229, 142, 183, 0.24);
 }
 
@@ -29,7 +29,7 @@
 .trimester-filter-field {
   display: grid;
   gap: 0.4rem;
-  color: #7d4f63;
+  color: #8c4f70;
   font-weight: 600;
 }
 
@@ -43,7 +43,7 @@
   border: 1px solid rgba(205, 137, 169, 0.35);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.95);
-  color: #6d3f56;
+  color: #7f4362;
 }
 
 .trimester-filter-group {
@@ -64,7 +64,7 @@
 }
 
 .trimester-filter-button.active {
-  background: linear-gradient(135deg, #f37cb1, #e45796);
+  background: var(--pink-gradient-main);
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 10px 24px rgba(228, 87, 150, 0.22);

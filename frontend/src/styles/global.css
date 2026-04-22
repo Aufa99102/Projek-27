@@ -3,8 +3,20 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #12303b;
-  background: #f4f8f7;
+  color: #5b2142;
+  background: #fff4fa;
+  --pink-strong: #e7549c;
+  --pink-main: #f472b6;
+  --pink-soft: #fbc2de;
+  --pink-pale: #fff0f7;
+  --pink-surface: rgba(255, 255, 255, 0.92);
+  --pink-border: rgba(223, 112, 171, 0.24);
+  --pink-shadow: rgba(188, 72, 133, 0.18);
+  --pink-text: #5b2142;
+  --pink-muted: #8d5d77;
+  --pink-gradient-main: linear-gradient(135deg, #ff8ec2 0%, #f472b6 48%, #e7549c 100%);
+  --pink-gradient-soft: linear-gradient(180deg, #fff4fa 0%, #ffe7f3 50%, #ffd7ea 100%);
+  --pink-gradient-card: linear-gradient(135deg, rgba(255, 247, 251, 0.98) 0%, rgba(255, 232, 243, 0.96) 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -28,7 +40,10 @@ body {
 body {
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #e6dfe2 0%, #ffffff 100%);
+  background:
+    radial-gradient(circle at top left, rgba(255, 182, 213, 0.4), transparent 30%),
+    radial-gradient(circle at top right, rgba(244, 114, 182, 0.24), transparent 26%),
+    var(--pink-gradient-soft);
 }
 
 /* ROOT APP WRAPPER */
@@ -57,7 +72,7 @@ textarea {
   border: none;
   border-radius: 14px;
   padding: 0.95rem 1.2rem;
-  background: linear-gradient(135deg, #1f7a6a, #2d9f89);
+  background: var(--pink-gradient-main);
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -66,7 +81,7 @@ textarea {
 
 .primary-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(31, 122, 106, 0.18);
+  box-shadow: 0 14px 28px var(--pink-shadow);
 }
 
 .primary-button:disabled {
@@ -78,11 +93,11 @@ textarea {
 
 /* SECONDARY BUTTON */
 .secondary-button {
-  border: 1px solid #c7d7da;
+  border: 1px solid var(--pink-border);
   border-radius: 14px;
   padding: 0.75rem 1rem;
-  background: #ffffff;
-  color: #224852;
+  background: linear-gradient(135deg, #fff8fc, #ffe9f4);
+  color: var(--pink-text);
   font-weight: 600;
   cursor: pointer;
 }
@@ -96,15 +111,15 @@ textarea {
 }
 
 .alert.error {
-  background: #fff1f1;
-  color: #a03d3d;
-  border: 1px solid #f1c3c3;
+  background: linear-gradient(135deg, #fff0f6, #ffe0ea);
+  color: #a83563;
+  border: 1px solid rgba(228, 103, 154, 0.28);
 }
 
 .alert.success {
-  background: #ebfaf4;
-  color: #1f6e59;
-  border: 1px solid #b8e4d2;
+  background: linear-gradient(135deg, #fff4fb, #ffe8f5);
+  color: #a13a69;
+  border: 1px solid rgba(237, 145, 186, 0.28);
 }
 
 /* PAGE HEADER TEXT */
@@ -112,7 +127,7 @@ textarea {
   margin: 0 0 0.45rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #2f7d72;
+  color: #c04986;
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -120,5 +135,5 @@ textarea {
 /* EMPTY STATE */
 .empty-state {
   margin: 0;
-  color: #5a737a;
+  color: var(--pink-muted);
 }
