@@ -3,7 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const { testConnection } = require("./config/db");
 
-const loginRoutes = require("./routes/loginRoutes");
 const ibuRoutes = require("./routes/ibuRoutes");
 const kehamilanRoutes = require("./routes/kehamilanRoutes");
 const labRoutes = require("./routes/labRoutes");
@@ -60,9 +59,6 @@ app.get("/api/health/db", async (req, res) => {
 // ======================
 // ROUTES (FINAL FIX)
 // ======================
-
-// AUTH
-app.use("/api/auth", loginRoutes);
 
 // MASTER DATA
 app.use("/api/ibu", ibuRoutes);

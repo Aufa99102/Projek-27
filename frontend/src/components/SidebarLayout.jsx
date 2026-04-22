@@ -1,6 +1,5 @@
 import React from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { clearSession, getSession } from "../utils/api";
+import { NavLink, Outlet } from "react-router-dom";
 import "../styles/Layout.css";
 
 const navigationItems = [
@@ -15,14 +14,6 @@ const navigationItems = [
 ];
 
 function SidebarLayout() {
-  const navigate = useNavigate();
-  const session = getSession();
-
-  const handleLogout = () => {
-    clearSession();
-    navigate("/login");
-  };
-
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -51,14 +42,11 @@ function SidebarLayout() {
         </div>
 
         <div className="sidebar-footer">
-          <div className="user-card">
-            <span className="user-role">{session?.role}</span>
-            <strong>{session?.nama}</strong>
-            <span>{session?.email}</span>
+          <div className="system-card">
+            <span className="system-label">Mode Akses</span>
+            <strong>Aplikasi Langsung Aktif</strong>
+            <span>Login dan register telah dihapus dari sistem.</span>
           </div>
-          <button type="button" className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
         </div>
       </aside>
 
