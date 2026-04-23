@@ -1,8 +1,7 @@
 const { db } = require("../config/db");
 
-// ======================
+
 // GET ALL
-// ======================
 const GetDataIbu = async (req, res, next) => {
   try {
     const query = `
@@ -28,9 +27,8 @@ const GetDataIbu = async (req, res, next) => {
   }
 };
 
-// ======================
+
 // CREATE
-// ======================
 const CreateDataIbu = async (req, res, next) => {
   try {
     const {
@@ -99,9 +97,8 @@ const CreateDataIbu = async (req, res, next) => {
   }
 };
 
-// ======================
+
 // UPDATE
-// ======================
 const UpdateDataIbu = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -191,9 +188,8 @@ const UpdateDataIbu = async (req, res, next) => {
   }
 };
 
-// ======================
+
 // DELETE
-// ======================
 const DeleteDataIbu = async (req, res, next) => {
   try {
     const { id } = req.params;

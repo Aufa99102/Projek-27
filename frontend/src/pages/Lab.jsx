@@ -8,7 +8,6 @@ const fields = [
   { name: "albumin", label: "Albumin" },
   { name: "hbsag", label: "HBSAG" },
 
-  // 🔥 HIV dibuat dropdown ENUM
   {
     name: "hiv",
     label: "HIV",

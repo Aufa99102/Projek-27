@@ -229,7 +229,6 @@ function EntityPage({
                 );
               }
 
-              // 🔥 FIX SELECT (SUPPORT STRING & OBJECT)
               if (field.type === "select" && field.options) {
                 return (
                   <label key={field.name} className="form-group">

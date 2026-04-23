@@ -36,7 +36,6 @@ const fields = [
   { name: "no_jkn", label: "No JKN" },
   { name: "no_rekam_medis", label: "No Rekam Medis" },
 
-  // 🔥 Golongan Darah (dropdown)
   {
     name: "golongan_darah",
     label: "Golongan Darah",

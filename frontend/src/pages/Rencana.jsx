@@ -7,7 +7,6 @@ const fields = [
   { name: "penolong", label: "Penolong" },
   { name: "tempat", label: "Tempat" },
 
-  // 🔥 DIUBAH MENJADI DROPDOWN
   {
     name: "pendamping",
     label: "Pendamping",

@@ -1,6 +1,5 @@
 const {db} = require("../config/db");
 
-// Normalisasi array (tetap dipakai, ini bagus 👍)
 const normalizeArrayField = (value) => {
   if (Array.isArray(value)) {
     return value.map((item) => String(item).trim()).filter(Boolean);
@@ -16,7 +15,6 @@ const normalizeArrayField = (value) => {
   return [];
 };
 
-// Validasi relasi ibu pakai database
 const validateIbuRelation = async (ibuId) => {
   if (!ibuId) {
     return "Field ibu_id wajib diisi.";
