@@ -85,10 +85,18 @@
 
 .table-wrapper {
   overflow-x: auto;
+  width: 100%;
+  padding-bottom: 0.35rem;
 }
 
 .table-controls {
   margin-bottom: 1rem;
+}
+
+.table-scroll-hint {
+  margin: 0 0 0.85rem;
+  color: var(--pink-muted);
+  font-size: 0.9rem;
 }
 
 .status-badge {
@@ -138,9 +146,9 @@
 }
 
 .data-table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
 }
 
 .data-table th,
@@ -149,6 +157,7 @@
   text-align: left;
   border-bottom: 1px solid rgba(223, 112, 171, 0.16);
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .data-table th {
@@ -169,9 +178,19 @@
   font-weight: 600;
 }
 
+.table-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .table-button.edit {
   background: linear-gradient(135deg, #ffeef7, #ffddeb);
   color: #b14579;
+}
+
+.table-button.print {
+  background: linear-gradient(135deg, #fff4fb, #ffe2f0);
+  color: #9f3d6e;
 }
 
 .table-button.delete {

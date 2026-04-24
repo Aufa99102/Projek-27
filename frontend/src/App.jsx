@@ -10,11 +10,16 @@ import Persalinan from "./pages/Persalinan";
 import Rencana from "./pages/Rencana";
 import USG from "./pages/USG";
 
+
+import Output from "./pages/Output";
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<SidebarLayout />}>
+
         <Route index element={<Navigate to="/dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="ibu" element={<DataIbu />} />
         <Route path="kehamilan" element={<Kehamilan />} />
@@ -23,7 +28,10 @@ function App() {
         <Route path="persalinan" element={<Persalinan />} />
         <Route path="rencana" element={<Rencana />} />
         <Route path="usg" element={<USG />} />
+        <Route path="output" element={<Output />} />
+
       </Route>
+
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

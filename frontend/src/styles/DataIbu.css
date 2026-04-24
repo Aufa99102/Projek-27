@@ -1,3 +1,51 @@
 .data-ibu-page .page-header h2 {
   color: #d64f91;
 }
+
+.data-ibu-page .data-table th,
+.data-ibu-page .data-table td {
+  padding: 0.65rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.data-ibu-page .data-table td {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.data-ibu-page .data-table th {
+  white-space: nowrap;
+}
+
+.data-ibu-page .status-badge {
+  min-width: 84px;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.72rem;
+}
+
+.data-ibu-page .action-buttons {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.data-ibu-page .table-button {
+  width: 100%;
+  padding: 0.48rem 0.65rem;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.data-ibu-page .data-table th:nth-child(2),
+.data-ibu-page .data-table td:nth-child(2) {
+  min-width: 140px;
+}
+
+.data-ibu-page .data-table th:nth-child(6),
+.data-ibu-page .data-table td:nth-child(6) {
+  min-width: 120px;
+}
+
+.data-ibu-page .data-table th:nth-child(8),
+.data-ibu-page .data-table td:nth-child(8) {
+  min-width: 150px;
+}

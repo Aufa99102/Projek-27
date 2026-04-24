@@ -18,6 +18,8 @@ function EntityPage({
   transformRecord,
   filterRecords,
   renderTableControls,
+  onSuccess,
+  renderRowActions,
 }) {
   const [formData, setFormData] = useState(() => buildInitialState(fields));
   const [records, setRecords] = useState([]);
@@ -40,10 +42,22 @@ function EntityPage({
       }
 
       const [recordResponse, ibuResponse] = await Promise.all(requests);
-      setRecords(recordResponse.data || []);
-      setIbuOptions(ibuResponse?.data || []);
+      const nextRecords = recordResponse.data || [];
+      const nextIbuOptions = ibuResponse?.data || [];
+
+      setRecords(nextRecords);
+      setIbuOptions(nextIbuOptions);
+
+      return {
+        records: nextRecords,
+        ibuOptions: nextIbuOptions,
+      };
     } catch (requestError) {
       setError(requestError.message);
+      return {
+        records: [],
+        ibuOptions: [],
+      };
     } finally {
       setLoading(false);
     }
@@ -82,20 +96,45 @@ function EntityPage({
     setSuccessMessage("");
 
     try {
-      const method = editingId ? "PUT" : "POST";
-      const url = editingId ? `${endpoint}/${editingId}` : endpoint;
+      const currentEditingId = editingId;
+      const submittedData = { ...formData };
+      const method = currentEditingId ? "PUT" : "POST";
+      const url = currentEditingId ? `${endpoint}/${currentEditingId}` : endpoint;
 
-      await fetchJson(url, {
+      const response = await fetchJson(url, {
         method,
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submittedData),
       });
+
+      const refreshedData = await loadData();
+      const latestSavedRecord =
+        refreshedData.records.find((record) => {
+          if (currentEditingId) {
+            return String(record.id) === String(currentEditingId);
+          }
+
+          if ("nik" in submittedData && submittedData.nik) {
+            return String(record.nik) === String(submittedData.nik);
+          }
+
+          return false;
+        }) ||
+        response?.data ||
+        submittedData;
 
       setFormData(buildInitialState(fields));
       setEditingId(null);
+
       setSuccessMessage(
-        editingId ? "Data berhasil diperbarui." : "Data berhasil disimpan."
+        currentEditingId ? "Data berhasil diperbarui." : "Data berhasil disimpan."
       );
-      await loadData();
+
+      if (onSuccess) {
+        onSuccess(latestSavedRecord, {
+          isEditing: Boolean(currentEditingId),
+        });
+      }
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -165,6 +204,8 @@ function EntityPage({
     return renderCellValue(record[column.key]);
   };
 
+  const shouldShowScrollHint = columns.length >= 10;
+
   return (
     <section className="entity-page">
       <div className="page-header">
@@ -176,7 +217,6 @@ function EntityPage({
       </div>
 
       <div className="entity-grid">
-        {/* FORM */}
         <div className="panel-card">
           <div className="panel-heading">
             <h3>{editingId ? "Edit Data" : "Form Input"}</h3>
@@ -192,7 +232,6 @@ function EntityPage({
 
           <form className="data-form" onSubmit={handleSubmit}>
             {fields.map((field) => {
-              // SELECT IBU
               if (field.type === "select-ibu") {
                 return (
                   <label key={field.name} className="form-group">
@@ -214,7 +253,6 @@ function EntityPage({
                 );
               }
 
-              // TEXTAREA
               if (field.type === "textarea") {
                 return (
                   <label key={field.name} className="form-group">
@@ -260,7 +298,6 @@ function EntityPage({
                 );
               }
 
-              // INPUT DEFAULT
               return (
                 <label key={field.name} className="form-group">
                   <span>{field.label}</span>
@@ -285,7 +322,6 @@ function EntityPage({
           </form>
         </div>
 
-        {/* TABLE */}
         <div className="panel-card">
           <h3>Daftar Data</h3>
 
@@ -297,6 +333,12 @@ function EntityPage({
                 ibuOptions,
               })}
             </div>
+          ) : null}
+
+          {shouldShowScrollHint ? (
+            <p className="table-scroll-hint">
+              Geser tabel ke kanan untuk melihat semua kolom data.
+            </p>
           ) : null}
 
           {loading ? (
@@ -322,6 +364,7 @@ function EntityPage({
                       ))}
                       <td>
                         <div className="action-buttons">
+                          {renderRowActions ? renderRowActions(record) : null}
                           <button
                             type="button"
                             className="table-button edit"
