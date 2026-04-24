@@ -11,6 +11,7 @@ const navigationItems = [
   { label: "Persalinan", path: "/persalinan" },
   { label: "Rencana", path: "/rencana" },
   { label: "USG", path: "/usg" },
+  { label: "Print Kartu Ibu", path: "/output" },
 ];
 
 function SidebarLayout() {
@@ -39,14 +40,6 @@ function SidebarLayout() {
               </NavLink>
             ))}
           </nav>
-        </div>
-
-        <div className="sidebar-footer">
-          <div className="system-card">
-            <span className="system-label">Mode Akses</span>
-            <strong>Aplikasi Langsung Aktif</strong>
-            <span>Login dan register telah dihapus dari sistem.</span>
-          </div>
         </div>
       </aside>
 

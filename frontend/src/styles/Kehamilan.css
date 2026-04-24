@@ -22,7 +22,7 @@
 
 .trimester-filter-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.85rem;
 }
 
@@ -44,6 +44,7 @@
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.95);
   color: #7f4362;
+  min-width: 0;
 }
 
 .trimester-filter-group {
@@ -79,10 +80,6 @@
   .trimester-filter-summary {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .trimester-filter-grid {
-    grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 }
 

@@ -26,17 +26,22 @@
 .stat-card {
   display: grid;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .stat-card span {
   font-size: 0.82rem;
   color: var(--pink-muted);
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .stat-card strong {
   font-size: 2rem;
   line-height: 1;
   color: var(--pink-text);
+  overflow-wrap: anywhere;
 }
 
 .stat-card.neutral {
@@ -81,6 +86,7 @@
   margin: 0;
   font-size: 1.05rem;
   color: var(--pink-text);
+  line-height: 1.35;
 }
 
 .summary-split {
@@ -112,11 +118,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .summary-row strong {
   font-size: 1.15rem;
   color: var(--pink-text);
+  flex-shrink: 0;
 }
 
 .dashboard-badge {
@@ -128,6 +136,10 @@
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-badge.success {
@@ -160,16 +172,20 @@
   display: grid;
   gap: 0.65rem;
   align-content: start;
+  min-width: 0;
 }
 
 .category-card strong {
   font-size: 1.8rem;
   color: var(--pink-text);
+  overflow-wrap: anywhere;
 }
 
 .category-card span:last-child {
   color: var(--pink-muted);
   font-size: 0.85rem;
+  line-height: 1.45;
+  white-space: normal;
 }
 
 .activity-list {
@@ -188,6 +204,8 @@
   display: block;
   margin-bottom: 0.45rem;
   color: var(--pink-text);
+  line-height: 1.4;
+  white-space: normal;
 }
 
 .activity-metrics {
@@ -218,5 +236,14 @@
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-badge {
+    min-width: 100%;
   }
 }

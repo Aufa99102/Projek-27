@@ -8,6 +8,27 @@ const buildInitialState = (fields) =>
     return accumulator;
   }, {});
 
+const validateFormData = (fields, formData) =>
+  fields.reduce((errors, field) => {
+    const rawValue = formData[field.name];
+    const value = typeof rawValue === "string" ? rawValue.trim() : rawValue;
+
+    if (field.required && (value === "" || value === null || value === undefined)) {
+      errors[field.name] = `${field.label} wajib diisi.`;
+      return errors;
+    }
+
+    if (typeof field.validate === "function") {
+      const validationMessage = field.validate(rawValue, formData);
+
+      if (validationMessage) {
+        errors[field.name] = validationMessage;
+      }
+    }
+
+    return errors;
+  }, {});
+
 function EntityPage({
   title,
   description,
@@ -20,6 +41,8 @@ function EntityPage({
   renderTableControls,
   onSuccess,
   renderRowActions,
+  separateViews = false,
+  defaultView = "table",
 }) {
   const [formData, setFormData] = useState(() => buildInitialState(fields));
   const [records, setRecords] = useState([]);
@@ -29,6 +52,8 @@ function EntityPage({
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [clientErrors, setClientErrors] = useState({});
+  const [activeView, setActiveView] = useState(defaultView);
 
   const loadData = async () => {
     setLoading(true);
@@ -87,13 +112,33 @@ function EntityPage({
       ...prev,
       [name]: value,
     }));
+
+    setClientErrors((prev) => {
+      if (!prev[name]) {
+        return prev;
+      }
+
+      const nextErrors = { ...prev };
+      delete nextErrors[name];
+      return nextErrors;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const validationErrors = validateFormData(fields, formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setClientErrors(validationErrors);
+      setError("");
+      setSuccessMessage("");
+      return;
+    }
+
     setSubmitting(true);
     setError("");
     setSuccessMessage("");
+    setClientErrors({});
 
     try {
       const currentEditingId = editingId;
@@ -124,6 +169,10 @@ function EntityPage({
 
       setFormData(buildInitialState(fields));
       setEditingId(null);
+      setClientErrors({});
+      if (separateViews) {
+        setActiveView("table");
+      }
 
       setSuccessMessage(
         currentEditingId ? "Data berhasil diperbarui." : "Data berhasil disimpan."
@@ -161,6 +210,10 @@ function EntityPage({
     setEditingId(record.id);
     setError("");
     setSuccessMessage("");
+    setClientErrors({});
+    if (separateViews) {
+      setActiveView("form");
+    }
   };
 
   const handleDelete = async (id) => {
@@ -186,6 +239,10 @@ function EntityPage({
     setFormData(buildInitialState(fields));
     setError("");
     setSuccessMessage("");
+    setClientErrors({});
+    if (separateViews) {
+      setActiveView("table");
+    }
   };
 
   const renderCellValue = (value) => {
@@ -204,7 +261,8 @@ function EntityPage({
     return renderCellValue(record[column.key]);
   };
 
-  const shouldShowScrollHint = columns.length >= 10;
+  const showFormPanel = !separateViews || activeView === "form";
+  const showTablePanel = !separateViews || activeView === "table";
 
   return (
     <section className="entity-page">
@@ -216,178 +274,243 @@ function EntityPage({
         </div>
       </div>
 
-      <div className="entity-grid">
-        <div className="panel-card">
-          <div className="panel-heading">
-            <h3>{editingId ? "Edit Data" : "Form Input"}</h3>
-            {editingId && (
-              <button onClick={handleCancelEdit} className="secondary-button">
-                Batal Edit
-              </button>
-            )}
-          </div>
+      {separateViews ? (
+        <div className="entity-view-switcher">
+          <button
+            type="button"
+            className={activeView === "table" ? "entity-view-button active" : "entity-view-button"}
+            onClick={() => setActiveView("table")}
+          >
+            Daftar Data
+          </button>
+          <button
+            type="button"
+            className={activeView === "form" ? "entity-view-button active" : "entity-view-button"}
+            onClick={() => setActiveView("form")}
+          >
+            {editingId ? "Edit Data" : "Form Input"}
+          </button>
+        </div>
+      ) : null}
 
-          {error && <div className="alert error">{error}</div>}
-          {successMessage && <div className="alert success">{successMessage}</div>}
+      <div className={separateViews ? "entity-grid entity-grid-single" : "entity-grid"}>
+        {showFormPanel ? (
+          <div className="panel-card">
+            <div className="panel-heading">
+              <h3>{editingId ? "Edit Data" : "Form Input"}</h3>
+              {editingId && (
+                <button onClick={handleCancelEdit} className="secondary-button">
+                  Batal Edit
+                </button>
+              )}
+            </div>
 
-          <form className="data-form" onSubmit={handleSubmit}>
-            {fields.map((field) => {
-              if (field.type === "select-ibu") {
-                return (
-                  <label key={field.name} className="form-group">
-                    <span>{field.label}</span>
-                    <select
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleChange}
-                      required={field.required}
-                    >
-                      <option value="">Pilih ibu</option>
-                      {ibuOptions.map((ibu) => (
-                        <option key={ibu.id} value={ibu.id}>
-                          {ibu.nama}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                );
-              }
+            {error && <div className="alert error">{error}</div>}
+            {successMessage && <div className="alert success">{successMessage}</div>}
+            {Object.keys(clientErrors).length > 0 ? (
+              <div className="alert error form-errors">
+                <strong>Periksa kembali form berikut:</strong>
+                <ul>
+                  {Object.values(clientErrors).map((message) => (
+                    <li key={message}>{message}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
-              if (field.type === "textarea") {
-                return (
-                  <label key={field.name} className="form-group">
-                    <span>{field.label}</span>
-                    <textarea
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleChange}
-                      required={field.required}
-                    />
-                  </label>
-                );
-              }
+            <form className="data-form" onSubmit={handleSubmit}>
+              {fields.map((field) => {
+                if (field.type === "select-ibu") {
+                  return (
+                    <label key={field.name} className="form-group">
+                      <span>{field.label}</span>
+                      <select
+                        className={clientErrors[field.name] ? "input-error" : ""}
+                        name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleChange}
+                        required={field.required}
+                      >
+                        <option value="">Pilih ibu</option>
+                        {ibuOptions.map((ibu) => (
+                          <option key={ibu.id} value={ibu.id}>
+                            {ibu.nama}
+                          </option>
+                        ))}
+                      </select>
+                      {clientErrors[field.name] ? (
+                        <small className="field-error">{clientErrors[field.name]}</small>
+                      ) : null}
+                    </label>
+                  );
+                }
 
-              if (field.type === "select" && field.options) {
-                return (
-                  <label key={field.name} className="form-group">
-                    <span>{field.label}</span>
-                    <select
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleChange}
-                      required={field.required}
-                    >
-                      <option value="">Pilih</option>
-                      {field.options.map((option) => {
-                        if (typeof option === "string") {
+                if (field.type === "textarea") {
+                  return (
+                    <label key={field.name} className="form-group">
+                      <span>{field.label}</span>
+                      <textarea
+                        className={clientErrors[field.name] ? "input-error" : ""}
+                        name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleChange}
+                        required={field.required}
+                        placeholder={field.placeholder}
+                      />
+                      {clientErrors[field.name] ? (
+                        <small className="field-error">{clientErrors[field.name]}</small>
+                      ) : null}
+                    </label>
+                  );
+                }
+
+                if (field.type === "select" && field.options) {
+                  return (
+                    <label key={field.name} className="form-group">
+                      <span>{field.label}</span>
+                      <select
+                        className={clientErrors[field.name] ? "input-error" : ""}
+                        name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleChange}
+                        required={field.required}
+                      >
+                        <option value="">Pilih</option>
+                        {field.options.map((option) => {
+                          if (typeof option === "string") {
+                            return (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            );
+                          }
+
                           return (
-                            <option key={option} value={option}>
-                              {option}
+                            <option key={option.value} value={option.value}>
+                              {option.label}
                             </option>
                           );
-                        }
+                        })}
+                      </select>
+                      {clientErrors[field.name] ? (
+                        <small className="field-error">{clientErrors[field.name]}</small>
+                      ) : null}
+                    </label>
+                  );
+                }
 
-                        return (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        );
-                      })}
-                    </select>
+                return (
+                  <label key={field.name} className="form-group">
+                    <span>{field.label}</span>
+                    <input
+                      type={field.type || "text"}
+                      className={clientErrors[field.name] ? "input-error" : ""}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleChange}
+                      required={field.required}
+                      placeholder={field.placeholder}
+                      inputMode={field.inputMode}
+                      maxLength={field.maxLength}
+                    />
+                    {clientErrors[field.name] ? (
+                      <small className="field-error">{clientErrors[field.name]}</small>
+                    ) : null}
                   </label>
                 );
-              }
-
-              return (
-                <label key={field.name} className="form-group">
-                  <span>{field.label}</span>
-                  <input
-                    type={field.type || "text"}
-                    name={field.name}
-                    value={formData[field.name] || ""}
-                    onChange={handleChange}
-                    required={field.required}
-                  />
-                </label>
-              );
-            })}
-
-            <button type="submit" disabled={submitting} className="primary-button">
-              {submitting
-                ? "Menyimpan..."
-                : editingId
-                ? "Update Data"
-                : "Simpan Data"}
-            </button>
-          </form>
-        </div>
-
-        <div className="panel-card">
-          <h3>Daftar Data</h3>
-
-          {renderTableControls ? (
-            <div className="table-controls">
-              {renderTableControls({
-                records: mappedRecords,
-                displayedRecords,
-                ibuOptions,
               })}
+
+              <button type="submit" disabled={submitting} className="primary-button">
+                {submitting
+                  ? "Menyimpan..."
+                  : editingId
+                  ? "Update Data"
+                  : "Simpan Data"}
+              </button>
+            </form>
+          </div>
+        ) : null}
+
+        {showTablePanel ? (
+          <div className="panel-card">
+            <div className="panel-heading">
+              <h3>Daftar Data</h3>
+              {separateViews ? (
+                <button
+                  type="button"
+                  className="primary-button entity-add-button"
+                  onClick={() => {
+                    setEditingId(null);
+                    setFormData(buildInitialState(fields));
+                    setClientErrors({});
+                    setError("");
+                    setSuccessMessage("");
+                    setActiveView("form");
+                  }}
+                >
+                  Tambah Data
+                </button>
+              ) : null}
             </div>
-          ) : null}
 
-          {shouldShowScrollHint ? (
-            <p className="table-scroll-hint">
-              Geser tabel ke kanan untuk melihat semua kolom data.
-            </p>
-          ) : null}
+            {renderTableControls ? (
+              <div className="table-controls">
+                {renderTableControls({
+                  records: mappedRecords,
+                  displayedRecords,
+                  ibuOptions,
+                })}
+              </div>
+            ) : null}
 
-          {loading ? (
-            <p>Loading...</p>
-          ) : displayedRecords.length === 0 ? (
-            <p>Belum ada data yang dapat ditampilkan.</p>
-          ) : (
-            <div className="table-wrapper">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    {columns.map((col) => (
-                      <th key={col.key}>{col.label}</th>
-                    ))}
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayedRecords.map((record) => (
-                    <tr key={record.id}>
+            {loading ? (
+              <p>Loading...</p>
+            ) : displayedRecords.length === 0 ? (
+              <p>Belum ada data yang dapat ditampilkan.</p>
+            ) : (
+              <div className="table-wrapper">
+                <table className="data-table">
+                  <thead>
+                    <tr>
                       {columns.map((col) => (
-                        <td key={col.key}>{getCellContent(col, record)}</td>
+                        <th key={col.key}>{col.label}</th>
                       ))}
-                      <td>
-                        <div className="action-buttons">
-                          {renderRowActions ? renderRowActions(record) : null}
-                          <button
-                            type="button"
-                            className="table-button edit"
-                            onClick={() => handleEdit(record)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="table-button delete"
-                            onClick={() => handleDelete(record.id)}
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </td>
+                      <th>Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {displayedRecords.map((record) => (
+                      <tr key={record.id}>
+                        {columns.map((col) => (
+                          <td key={col.key}>{getCellContent(col, record)}</td>
+                        ))}
+                        <td>
+                          <div className="action-buttons">
+                            {renderRowActions ? renderRowActions(record) : null}
+                            <button
+                              type="button"
+                              className="table-button edit"
+                              onClick={() => handleEdit(record)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="table-button delete"
+                              onClick={() => handleDelete(record.id)}
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </section>
   );

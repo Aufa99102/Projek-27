@@ -134,7 +134,7 @@ export const formatMissingModulesMessage = (missingModules = []) => {
     return "";
   }
 
-  return `Output PDF belum bisa digunakan. Lengkapi modul berikut terlebih dahulu: ${missingModules.join(
+  return `Print kartu ibu belum bisa digunakan. Lengkapi modul berikut terlebih dahulu: ${missingModules.join(
     ", "
   )}.`;
 };
