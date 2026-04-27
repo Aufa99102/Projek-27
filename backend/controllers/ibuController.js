@@ -49,10 +49,10 @@ const CreateDataIbu = async (req, res, next) => {
       status_ibu,
     } = req.body;
 
-    if (!nama || !tanggal_lahir || !nik) {
+    if (!nama || !tanggal_lahir || !nama_suami || !alamat || !no_hp || !nik || !no_jkn || !no_rekam_medis || !golongan_darah || !hb || !lila || !gds || !status_hiv || !status_sifilis || !status_ibu) {
       return res.status(400).json({
         status: "error",
-        message: "Field nama, tanggal_lahir, dan nik wajib diisi",
+        message: "Semua Field wajib terisi",
       });
     }
 
@@ -121,10 +121,10 @@ const UpdateDataIbu = async (req, res, next) => {
       status_ibu,
     } = req.body;
 
-    if (!nama || !tanggal_lahir || !nik) {
+    if (!nama || !tanggal_lahir || !nama_suami || !alamat || !no_hp || !nik || !no_jkn || !no_rekam_medis || !golongan_darah || !hb || !lila || !gds || !status_hiv || !status_sifilis || !status_ibu) {
       return res.status(400).json({
         status: "error",
-        message: "Field nama, tanggal_lahir, dan nik wajib diisi",
+        message: "Semua Field wajib terisi",
       });
     }
 

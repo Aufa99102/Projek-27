@@ -29,6 +29,13 @@ const CreateDataRencana = async (req, res, next) => {
       calon_donor,
     } = req.body;
 
+    if (!ibu_id || !penolong || !tempat || !pendamping || !transportasi || !calon_donor) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -49,7 +56,7 @@ const CreateDataRencana = async (req, res, next) => {
       ibu_id,
       penolong || "",
       tempat || "",
-      pendamping || "keluarga", // 🔥 FIX ENUM SAFE
+      pendamping || "keluarga",
       transportasi || "",
       donor,
     ]);
@@ -77,6 +84,13 @@ const UpdateDataRencana = async (req, res, next) => {
       calon_donor,
     } = req.body;
 
+    if (!ibu_id || !penolong || !tempat || !pendamping || !transportasi || !calon_donor) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -97,7 +111,7 @@ const UpdateDataRencana = async (req, res, next) => {
       ibu_id,
       penolong || "",
       tempat || "",
-      pendamping || "keluarga", // 🔥 FIX ENUM SAFE
+      pendamping || "keluarga",
       transportasi || "",
       donor,
       id,

@@ -22,6 +22,14 @@ const CreateDataLab = async (req, res, next) => {
   try {
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
+    if (!ibu_id || !hb || !albumin || !hbsag || !hiv) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -40,7 +48,7 @@ const CreateDataLab = async (req, res, next) => {
       hb || "",
       albumin || "",
       hbsag || "",
-      hiv || "Negatif", // ✅ FIX: default ENUM aman
+      hiv || "Negatif",
     ]);
 
     return res.status(201).json({
@@ -57,6 +65,13 @@ const UpdateDataLab = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
+
+    if (!ibu_id || !hb || !albumin || !hbsag || !hiv) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
@@ -77,7 +92,7 @@ const UpdateDataLab = async (req, res, next) => {
       hb || "",
       albumin || "",
       hbsag || "",
-      hiv || "Negatif", // ✅ FIX: default ENUM aman
+      hiv || "Negatif", 
       id,
     ]);
 

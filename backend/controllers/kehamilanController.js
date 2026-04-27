@@ -31,6 +31,13 @@ const CreateDataKehamilan = async (req, res, next) => {
       imt,
     } = req.body;
 
+if (!ibu_id || !hpht || !hpl || !jarak_kehamilan || !status_imunisasi || !riwayat_penyakit || !bb_sebelum_hamil || !imt) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+}
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -82,6 +89,14 @@ const UpdateDataKehamilan = async (req, res, next) => {
       bb_sebelum_hamil,
       imt,
     } = req.body;
+
+  if (!ibu_id || !hpht || !hpl || !jarak_kehamilan || !status_imunisasi || !riwayat_penyakit || !bb_sebelum_hamil || !imt) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {

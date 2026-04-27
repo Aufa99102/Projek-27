@@ -30,6 +30,13 @@ const CreateDataUsg = async (req, res, next) => {
       taksiran_persalinan,
     } = req.body;
 
+    if (!ibu_id || !trimester || !gs || !crl || !djj || !letak_janin || !taksiran_persalinan) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -77,6 +84,13 @@ const UpdateDataUsg = async (req, res, next) => {
       letak_janin,
       taksiran_persalinan,
     } = req.body;
+
+    if (!ibu_id || !trimester || !gs || !crl || !djj || !letak_janin || !taksiran_persalinan) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {

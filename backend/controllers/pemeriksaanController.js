@@ -32,6 +32,13 @@ const CreateDataPemeriksaan = async (req, res, next) => {
       tanggal_kembali,
     } = req.body;
 
+    if (!ibu_id || !tanggal_kunjungan || !usia_kehamilan || !tekanan_darah || !berat_badan || !hasil_pemeriksaan || !terapi || !keterangan || !tanggal_kembali) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
+
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
       return res.status(400).json({
@@ -83,6 +90,13 @@ const UpdateDataPemeriksaan = async (req, res, next) => {
       keterangan,
       tanggal_kembali,
     } = req.body;
+
+    if (!ibu_id || !tanggal_kunjungan || !usia_kehamilan || !tekanan_darah || !berat_badan || !hasil_pemeriksaan || !terapi || !keterangan || !tanggal_kembali) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
+      });
+    }
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
