@@ -1,16 +1,23 @@
 const {db} = require("../config/db");
-const { normalizeArrayField, validateIbuRelation } = require("./helpers");
+const {
+  isBlank,
+  normalizeArrayField,
+  normalizeDateForDatabase,
+  normalizeRowsDateFieldsForClient,
+  validateIbuRelation,
+} = require("./helpers");
 
 // GET ALL
 const GetDataKehamilan = async (req, res, next) => {
   try {
     const query = "SELECT * FROM kehamilan";
     const [rows] = await db.execute(query);
+    const normalizedRows = normalizeRowsDateFieldsForClient(rows, ["hpht", "hpl"]);
 
     return res.status(200).json({
       status: "success",
       message: "Berhasil mengambil data kehamilan",
-      data: rows,
+      data: normalizedRows,
     });
   } catch (error) {
     next(error);
@@ -31,7 +38,19 @@ const CreateDataKehamilan = async (req, res, next) => {
       imt,
     } = req.body;
 
-if (!ibu_id || !hpht || !hpl || !jarak_kehamilan || !status_imunisasi || !riwayat_penyakit || !bb_sebelum_hamil || !imt) {
+    const normalizedHpht = normalizeDateForDatabase(hpht);
+    const normalizedHpl = normalizeDateForDatabase(hpl);
+
+    if (
+      isBlank(ibu_id) ||
+      !normalizedHpht ||
+      !normalizedHpl ||
+      isBlank(jarak_kehamilan) ||
+      isBlank(status_imunisasi) ||
+      isBlank(riwayat_penyakit) ||
+      isBlank(bb_sebelum_hamil) ||
+      isBlank(imt)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -56,8 +75,8 @@ if (!ibu_id || !hpht || !hpl || !jarak_kehamilan || !status_imunisasi || !riwaya
 
     await db.execute(query, [
       ibu_id,
-      hpht || "",
-      hpl || "",
+      normalizedHpht,
+      normalizedHpl,
       jarak_kehamilan || "",
       imunisasi,
       riwayat_penyakit || "",
@@ -90,7 +109,19 @@ const UpdateDataKehamilan = async (req, res, next) => {
       imt,
     } = req.body;
 
-  if (!ibu_id || !hpht || !hpl || !jarak_kehamilan || !status_imunisasi || !riwayat_penyakit || !bb_sebelum_hamil || !imt) {
+    const normalizedHpht = normalizeDateForDatabase(hpht);
+    const normalizedHpl = normalizeDateForDatabase(hpl);
+
+  if (
+      isBlank(ibu_id) ||
+      !normalizedHpht ||
+      !normalizedHpl ||
+      isBlank(jarak_kehamilan) ||
+      isBlank(status_imunisasi) ||
+      isBlank(riwayat_penyakit) ||
+      isBlank(bb_sebelum_hamil) ||
+      isBlank(imt)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -116,8 +147,8 @@ const UpdateDataKehamilan = async (req, res, next) => {
 
     const [result] = await db.execute(query, [
       ibu_id,
-      hpht || "",
-      hpl || "",
+      normalizedHpht,
+      normalizedHpl,
       jarak_kehamilan || "",
       imunisasi,
       riwayat_penyakit || "",

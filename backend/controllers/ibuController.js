@@ -1,4 +1,9 @@
 const { db } = require("../config/db");
+const {
+  isBlank,
+  normalizeDateForDatabase,
+  normalizeRowsDateFieldsForClient,
+} = require("./helpers");
 
 
 // GET ALL
@@ -15,11 +20,12 @@ const GetDataIbu = async (req, res, next) => {
     `;
 
     const [rows] = await db.execute(query);
+    const normalizedRows = normalizeRowsDateFieldsForClient(rows, ["tanggal_lahir"]);
 
     return res.status(200).json({
       status: "success",
       message: "Berhasil mengambil data ibu",
-      data: rows,
+      data: normalizedRows,
     });
   } catch (error) {
     console.error("GET IBU ERROR:", error);
@@ -49,7 +55,25 @@ const CreateDataIbu = async (req, res, next) => {
       status_ibu,
     } = req.body;
 
-    if (!nama || !tanggal_lahir || !nama_suami || !alamat || !no_hp || !nik || !no_jkn || !no_rekam_medis || !golongan_darah || !hb || !lila || !gds || !status_hiv || !status_sifilis || !status_ibu) {
+    const normalizedTanggalLahir = normalizeDateForDatabase(tanggal_lahir);
+
+    if (
+      isBlank(nama) ||
+      !normalizedTanggalLahir ||
+      isBlank(nama_suami) ||
+      isBlank(alamat) ||
+      isBlank(no_hp) ||
+      isBlank(nik) ||
+      isBlank(no_jkn) ||
+      isBlank(no_rekam_medis) ||
+      isBlank(golongan_darah) ||
+      isBlank(hb) ||
+      isBlank(lila) ||
+      isBlank(gds) ||
+      isBlank(status_hiv) ||
+      isBlank(status_sifilis) ||
+      isBlank(status_ibu)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -69,7 +93,7 @@ const CreateDataIbu = async (req, res, next) => {
 
     await db.execute(query, [
       nama,
-      tanggal_lahir,
+      normalizedTanggalLahir,
       nama_suami || "",
       alamat || "",
       no_hp || "",
@@ -121,7 +145,25 @@ const UpdateDataIbu = async (req, res, next) => {
       status_ibu,
     } = req.body;
 
-    if (!nama || !tanggal_lahir || !nama_suami || !alamat || !no_hp || !nik || !no_jkn || !no_rekam_medis || !golongan_darah || !hb || !lila || !gds || !status_hiv || !status_sifilis || !status_ibu) {
+    const normalizedTanggalLahir = normalizeDateForDatabase(tanggal_lahir);
+
+    if (
+      isBlank(nama) ||
+      !normalizedTanggalLahir ||
+      isBlank(nama_suami) ||
+      isBlank(alamat) ||
+      isBlank(no_hp) ||
+      isBlank(nik) ||
+      isBlank(no_jkn) ||
+      isBlank(no_rekam_medis) ||
+      isBlank(golongan_darah) ||
+      isBlank(hb) ||
+      isBlank(lila) ||
+      isBlank(gds) ||
+      isBlank(status_hiv) ||
+      isBlank(status_sifilis) ||
+      isBlank(status_ibu)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -151,7 +193,7 @@ const UpdateDataIbu = async (req, res, next) => {
 
     const [result] = await db.execute(query, [
       nama,
-      tanggal_lahir,
+      normalizedTanggalLahir,
       nama_suami || "",
       alamat || "",
       no_hp || "",

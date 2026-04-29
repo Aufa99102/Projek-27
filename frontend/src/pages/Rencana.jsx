@@ -4,8 +4,8 @@ import "../styles/Rencana.css";
 
 const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
-  { name: "penolong", label: "Penolong" },
-  { name: "tempat", label: "Tempat" },
+  { name: "penolong", label: "Penolong", required: true, textOnly: true },
+  { name: "tempat", label: "Tempat", required: true, textOnly: true },
 
   {
     name: "pendamping",
@@ -18,17 +18,18 @@ const fields = [
     required: true,
   },
 
-  { name: "transportasi", label: "Transportasi" },
+  { name: "transportasi", label: "Transportasi", required: true, textOnly: true },
   {
     name: "calon_donor",
     label: "Calon Donor",
+    required: true,
     placeholder: "Contoh: Donor A, Donor B",
   },
 ];
 
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "ibu_id", label: "Ibu ID" },
+  { key: "nomor", label: "Nomor" },
+  { key: "ibu_nama", label: "Nama Ibu" },
   { key: "penolong", label: "Penolong" },
   { key: "tempat", label: "Tempat" },
   { key: "pendamping", label: "Pendamping" },

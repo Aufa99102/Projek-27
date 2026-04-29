@@ -2,6 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { fetchJson } from "../utils/api";
 import "../styles/EntityPage.css";
 
+const INDONESIAN_MONTHS = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
 const buildInitialState = (fields) =>
   fields.reduce((accumulator, field) => {
     accumulator[field.name] = field.defaultValue || "";
@@ -12,10 +27,30 @@ const validateFormData = (fields, formData) =>
   fields.reduce((errors, field) => {
     const rawValue = formData[field.name];
     const value = typeof rawValue === "string" ? rawValue.trim() : rawValue;
+    const isEmptyValue = value === "" || value === null || value === undefined;
 
-    if (field.required && (value === "" || value === null || value === undefined)) {
+    if (field.required && isEmptyValue) {
       errors[field.name] = `${field.label} wajib diisi.`;
       return errors;
+    }
+
+    if (!isEmptyValue && field.textOnly && /\d/.test(String(value))) {
+      errors[field.name] = `${field.label} hanya boleh berisi huruf.`;
+      return errors;
+    }
+
+    if (!isEmptyValue && (field.numericOnly || field.type === "number" || field.inputMode === "numeric")) {
+      const normalizedValue = String(value).replace(",", ".").trim();
+      const numericPattern = field.allowDecimal
+        ? /^\d+([.]\d+)?$/
+        : /^\d+$/;
+
+      if (!numericPattern.test(normalizedValue)) {
+        errors[field.name] = field.allowDecimal
+          ? `${field.label} hanya boleh berisi angka.`
+          : `${field.label} hanya boleh berisi angka tanpa huruf.`;
+        return errors;
+      }
     }
 
     if (typeof field.validate === "function") {
@@ -28,6 +63,118 @@ const validateFormData = (fields, formData) =>
 
     return errors;
   }, {});
+
+const extractDateParts = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return null;
+    }
+
+    const dayFirstMatch = trimmedValue.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (dayFirstMatch) {
+      const [, day, month, year] = dayFirstMatch;
+      return { day, month, year };
+    }
+
+    const indonesianMonthMatch = trimmedValue.match(
+      /^(\d{2})\s+([A-Za-z]+)\s+(\d{4})$/
+    );
+    if (indonesianMonthMatch) {
+      const [, day, monthLabel, year] = indonesianMonthMatch;
+      const monthIndex = INDONESIAN_MONTHS.findIndex(
+        (month) => month.toLowerCase() === monthLabel.toLowerCase()
+      );
+
+      if (monthIndex >= 0) {
+        return {
+          day,
+          month: String(monthIndex + 1).padStart(2, "0"),
+          year,
+        };
+      }
+    }
+
+    const isoLikeMatch = trimmedValue.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T)/);
+    if (isoLikeMatch) {
+      const [, year, month, day] = isoLikeMatch;
+      return { day, month, year };
+    }
+  }
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return {
+    day: String(parsedDate.getUTCDate()).padStart(2, "0"),
+    month: String(parsedDate.getUTCMonth() + 1).padStart(2, "0"),
+    year: String(parsedDate.getUTCFullYear()),
+  };
+};
+
+const normalizeDate = (value) => {
+  const parts = extractDateParts(value);
+
+  if (!parts) {
+    return "";
+  }
+
+  return `${parts.day}-${parts.month}-${parts.year}`;
+};
+
+const formatDisplayDate = (value) => {
+  const parts = extractDateParts(value);
+
+  if (!parts) {
+    return "";
+  }
+
+  const monthLabel = INDONESIAN_MONTHS[Number(parts.month) - 1];
+
+  return monthLabel ? `${parts.day} ${monthLabel} ${parts.year}` : "";
+};
+
+const toDateInputValue = (value) => {
+  const parts = extractDateParts(value);
+
+  if (!parts) {
+    return "";
+  }
+
+  return `${parts.year}-${parts.month}-${parts.day}`;
+};
+
+const normalizeRecordDateFields = (record, fields, formatter = formatDisplayDate) =>
+  fields.reduce((normalizedRecord, field) => {
+    if (field.type !== "date" || !(field.name in normalizedRecord)) {
+      return normalizedRecord;
+    }
+
+    return {
+      ...normalizedRecord,
+      [field.name]: formatter(normalizedRecord[field.name]),
+    };
+  }, { ...record });
+
+const attachIbuName = (record, ibuOptions) => {
+  if (!record || record.ibu_id === null || record.ibu_id === undefined) {
+    return record;
+  }
+
+  const ibu = ibuOptions.find((item) => String(item.id) === String(record.ibu_id));
+
+  return {
+    ...record,
+    ibu_nama: ibu?.nama || record.ibu_nama || `Ibu ID ${record.ibu_id}`,
+  };
+};
 
 function EntityPage({
   title,
@@ -92,13 +239,24 @@ function EntityPage({
     loadData();
   }, [endpoint, requireIbuOptions]);
 
+  const normalizedRecords = useMemo(
+    () =>
+      records.map((record) =>
+        normalizeRecordDateFields(attachIbuName(record, ibuOptions), fields)
+      ),
+    [records, fields, ibuOptions]
+  );
+
   const mappedRecords = useMemo(() => {
-    if (!transformRecord) return records;
+    if (!transformRecord) return normalizedRecords;
 
     return records.map((record) =>
-      transformRecord(record, { ibuOptions })
+      normalizeRecordDateFields(
+        attachIbuName(transformRecord(record, { ibuOptions }), ibuOptions),
+        fields
+      )
     );
-  }, [records, ibuOptions, transformRecord]);
+  }, [records, normalizedRecords, ibuOptions, transformRecord, fields]);
 
   const displayedRecords = useMemo(() => {
     if (!filterRecords) return mappedRecords;
@@ -107,7 +265,19 @@ function EntityPage({
   }, [mappedRecords, ibuOptions, filterRecords]);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name } = event.target;
+    const field = fields.find((item) => item.name === name);
+    let { value } = event.target;
+
+    if (field?.numericOnly || field?.inputMode === "numeric" || field?.type === "number") {
+      value = field.allowDecimal
+        ? value
+            .replace(/,/g, ".")
+            .replace(/[^\d.]/g, "")
+            .replace(/(\..*)\./g, "$1")
+        : value.replace(/\D/g, "");
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -142,7 +312,14 @@ function EntityPage({
 
     try {
       const currentEditingId = editingId;
-      const submittedData = { ...formData };
+      const submittedData = fields.reduce((accumulator, field) => {
+        const value = formData[field.name];
+
+        accumulator[field.name] =
+          field.type === "date" ? normalizeDate(value) : value;
+
+        return accumulator;
+      }, {});
       const method = currentEditingId ? "PUT" : "POST";
       const url = currentEditingId ? `${endpoint}/${currentEditingId}` : endpoint;
 
@@ -195,7 +372,9 @@ function EntityPage({
     const newForm = fields.reduce((acc, field) => {
       const value = record[field.name];
 
-      if (Array.isArray(value)) {
+      if (field.type === "date") {
+        acc[field.name] = toDateInputValue(value);
+      } else if (Array.isArray(value)) {
         acc[field.name] = value.join(", ");
       } else if (value === null || value === undefined) {
         acc[field.name] = "";
@@ -479,10 +658,14 @@ function EntityPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedRecords.map((record) => (
+                    {displayedRecords.map((record, rowIndex) => (
                       <tr key={record.id}>
-                        {columns.map((col) => (
-                          <td key={col.key}>{getCellContent(col, record)}</td>
+                        {columns.map((col, columnIndex) => (
+                          <td key={`${col.key}-${columnIndex}`}>
+                            {col.key === "nomor"
+                              ? rowIndex + 1
+                              : getCellContent(col, record)}
+                          </td>
                         ))}
                         <td>
                           <div className="action-buttons">

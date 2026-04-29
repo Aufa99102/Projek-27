@@ -1,5 +1,5 @@
 const { db } = require("../config/db");
-const { validateIbuRelation } = require("./helpers");
+const { isBlank, validateIbuRelation } = require("./helpers");
 
 // GET ALL
 const GetDataPersalinan = async (req, res, next) => {
@@ -40,10 +40,17 @@ const CreateDataPersalinan = async (req, res, next) => {
       kelainan,
     } = req.body;
 
-    if (!ibu_id) {
+    if (isBlank(ibu_id)) {
       return res.status(400).json({
         status: "error",
         message: "Field ibu_id wajib diisi",
+      });
+    }
+
+    if (isBlank(jenis_persalinan) || isBlank(komplikasi) || isBlank(bb_bayi) || isBlank(kelainan)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
       });
     }
 
@@ -98,10 +105,17 @@ const UpdateDataPersalinan = async (req, res, next) => {
       kelainan,
     } = req.body;
 
-    if (!ibu_id) {
+    if (isBlank(ibu_id)) {
       return res.status(400).json({
         status: "error",
         message: "Field ibu_id wajib diisi",
+      });
+    }
+
+    if (isBlank(jenis_persalinan) || isBlank(komplikasi) || isBlank(bb_bayi) || isBlank(kelainan)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua Field wajib terisi",
       });
     }
 

@@ -4,17 +4,23 @@ import "../styles/Kehamilan.css";
 
 const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
-  { name: "hpht", label: "HPHT", type: "date" },
-  { name: "hpl", label: "HPL", type: "date" },
-  { name: "jarak_kehamilan", label: "Jarak Kehamilan" },
+  { name: "hpht", label: "Tanggal HPHT", type: "date", required: true },
+  { name: "hpl", label: "Tanggal HPL", type: "date", required: true },
+  { name: "jarak_kehamilan", label: "Jarak Kehamilan", required: true, numericOnly: true },
   {
     name: "status_imunisasi",
     label: "Status Imunisasi",
+    required: true,
     placeholder: "Contoh: TT1, TT2",
   },
-  { name: "riwayat_penyakit", label: "Riwayat Penyakit", type: "textarea" },
-  { name: "bb_sebelum_hamil", label: "BB Sebelum Hamil" },
-  { name: "imt", label: "IMT" },
+  {
+    name: "riwayat_penyakit",
+    label: "Riwayat Penyakit",
+    type: "textarea",
+    required: true,
+  },
+  { name: "bb_sebelum_hamil", label: "BB Sebelum Hamil", required: true, numericOnly: true, allowDecimal: true },
+  { name: "imt", label: "IMT", required: true, numericOnly: true, allowDecimal: true },
 ];
 
 const KATEGORI_OPTIONS = [
@@ -45,17 +51,31 @@ const STATUS_SIFILIS_OPTIONS = [
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const WEEK_IN_MONTH = 4;
 
+const getStartOfLocalDay = (date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
 const parseDate = (value) => {
   if (!value) {
     return null;
   }
 
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    const dayFirstMatch = trimmedValue.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+
+    if (dayFirstMatch) {
+      const [, day, month, year] = dayFirstMatch;
+      const parsedDayFirstDate = new Date(Number(year), Number(month) - 1, Number(day));
+      return Number.isNaN(parsedDayFirstDate.getTime()) ? null : parsedDayFirstDate;
+    }
+  }
+
   const parsedDate = new Date(value);
-  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+  return Number.isNaN(parsedDate.getTime()) ? null : getStartOfLocalDay(parsedDate);
 };
 
 const hitungUsiaKehamilan = (hpht) => {
-  const now = new Date();
+  const now = getStartOfLocalDay(new Date());
   const hphtDate = parseDate(hpht);
 
   if (!hphtDate) {
@@ -182,8 +202,8 @@ function Kehamilan() {
   });
 
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "ibu_nama", label: "Klien" },
+    { key: "nomor", label: "Nomor" },
+    { key: "ibu_nama", label: "Nama Ibu" },
     { key: "usia_kehamilan_label", label: "Usia Kehamilan" },
     {
       key: "kategori_kehamilan_label",
@@ -230,8 +250,8 @@ function Kehamilan() {
             : "neutral"
         ),
     },
-    { key: "hpht", label: "HPHT" },
-    { key: "hpl", label: "HPL" },
+    { key: "hpht", label: "Tanggal HPHT" },
+    { key: "hpl", label: "Tanggal HPL" },
     { key: "jarak_kehamilan", label: "Jarak" },
     { key: "status_imunisasi", label: "Imunisasi" },
     { key: "riwayat_penyakit", label: "Riwayat Penyakit" },

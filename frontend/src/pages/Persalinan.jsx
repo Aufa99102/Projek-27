@@ -8,19 +8,20 @@ const fields = [
     name: "jenis_persalinan",
     label: "Jenis Persalinan",
     type: "select",
+    required: true,
     options: [
       { label: "Normal", value: "Normal" },
       { label: "SC", value: "SC" },
     ],
   },
-  { name: "komplikasi", label: "Komplikasi", type: "textarea" },
-  { name: "bb_bayi", label: "BB Bayi" },
-  { name: "kelainan", label: "Kelainan", type: "textarea" },
+  { name: "komplikasi", label: "Komplikasi", type: "textarea", required: true },
+  { name: "bb_bayi", label: "BB Bayi", required: true, numericOnly: true, allowDecimal: true },
+  { name: "kelainan", label: "Kelainan", type: "textarea", required: true },
 ];
 
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "ibu_id", label: "Ibu ID" },
+  { key: "nomor", label: "Nomor" },
+  { key: "ibu_nama", label: "Nama Ibu" },
   { key: "jenis_persalinan", label: "Jenis" },
   { key: "komplikasi", label: "Komplikasi" },
   { key: "bb_bayi", label: "BB Bayi" },
@@ -36,6 +37,8 @@ function Persalinan() {
         endpoint="/persalinan"
         fields={fields}
         columns={columns}
+        separateViews
+        defaultView="table"
       />
     </div>
   );

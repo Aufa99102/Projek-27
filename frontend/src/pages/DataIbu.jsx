@@ -54,6 +54,7 @@ const fields = [
     name: "nama",
     label: "Nama Ibu",
     required: true,
+    textOnly: true,
     placeholder: "Masukkan nama lengkap ibu",
   },
   {
@@ -64,16 +65,24 @@ const fields = [
     validate: (value) =>
       isValidDateValue(value) ? null : "Tanggal lahir tidak valid.",
   },
-  { name: "nama_suami", label: "Nama Suami", placeholder: "Masukkan nama suami" },
+  {
+    name: "nama_suami",
+    label: "Nama Suami",
+    required: true,
+    textOnly: true,
+    placeholder: "Masukkan nama suami",
+  },
   {
     name: "alamat",
     label: "Alamat",
     type: "textarea",
+    required: true,
     placeholder: "Masukkan alamat lengkap",
   },
   {
     name: "no_hp",
     label: "No HP",
+    required: true,
     inputMode: "numeric",
     placeholder: "Contoh: 081234567890",
     validate: buildPhoneValidator,
@@ -90,6 +99,7 @@ const fields = [
   {
     name: "no_jkn",
     label: "No JKN",
+    required: true,
     inputMode: "numeric",
     maxLength: 13,
     placeholder: "13 digit nomor JKN",
@@ -98,21 +108,24 @@ const fields = [
   {
     name: "no_rekam_medis",
     label: "No Rekam Medis",
+    required: true,
     placeholder: "Masukkan nomor rekam medis",
   },
   {
     name: "golongan_darah",
     label: "Golongan Darah",
     type: "select",
+    required: true,
     options: ["A", "B", "AB", "O"],
   },
-  { name: "hb", label: "HB", type: "number" },
-  { name: "lila", label: "LILA", type: "number" },
-  { name: "gds", label: "GDS", type: "number" },
+  { name: "hb", label: "HB", type: "number", required: true, allowDecimal: true },
+  { name: "lila", label: "LILA", type: "number", required: true, allowDecimal: true },
+  { name: "gds", label: "GDS", type: "number", required: true, allowDecimal: true },
   {
     name: "status_hiv",
     label: "Status HIV",
     type: "select",
+    required: true,
     options: [
       { value: "Non-reaktif", label: "Non-reaktif" },
       { value: "Reaktif", label: "Reaktif" },
@@ -122,6 +135,7 @@ const fields = [
     name: "status_sifilis",
     label: "Status Sifilis",
     type: "select",
+    required: true,
     options: [
       { value: "Negatif", label: "Negatif" },
       { value: "Positif", label: "Positif" },
@@ -131,6 +145,7 @@ const fields = [
     name: "status_ibu",
     label: "Status Ibu",
     type: "select",
+    required: true,
     options: [
       { value: "baru", label: "Ibu hamil baru" },
       { value: "lama", label: "Ibu hamil lama" },
@@ -139,7 +154,7 @@ const fields = [
 ];
 
 const columns = [
-  { key: "id", label: "ID" },
+  { key: "nomor", label: "Nomor" },
   { key: "nama", label: "Nama" },
   {
     key: "status_ibu",

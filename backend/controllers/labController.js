@@ -1,5 +1,5 @@
 const { db } = require("../config/db");
-const { validateIbuRelation } = require("./helpers");
+const { isBlank, validateIbuRelation } = require("./helpers");
 
 // GET ALL
 const GetDataLab = async (req, res, next) => {
@@ -22,7 +22,13 @@ const CreateDataLab = async (req, res, next) => {
   try {
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
-    if (!ibu_id || !hb || !albumin || !hbsag || !hiv) {
+    if (
+      isBlank(ibu_id) ||
+      isBlank(hb) ||
+      isBlank(albumin) ||
+      isBlank(hbsag) ||
+      isBlank(hiv)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -66,7 +72,13 @@ const UpdateDataLab = async (req, res, next) => {
     const { id } = req.params;
     const { ibu_id, hb, albumin, hbsag, hiv } = req.body;
 
-    if (!ibu_id || !hb || !albumin || !hbsag || !hiv) {
+    if (
+      isBlank(ibu_id) ||
+      isBlank(hb) ||
+      isBlank(albumin) ||
+      isBlank(hbsag) ||
+      isBlank(hiv)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",

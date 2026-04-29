@@ -4,7 +4,7 @@ import "../styles/Lab.css";
 
 const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
-  { name: "hb", label: "HB" },
+  { name: "hb", label: "HB", numericOnly: true, allowDecimal: true },
   { name: "albumin", label: "Albumin" },
   { name: "hbsag", label: "HBSAG" },
 
@@ -20,8 +20,8 @@ const fields = [
 ];
 
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "ibu_id", label: "Ibu ID" },
+  { key: "nomor", label: "Nomor" },
+  { key: "ibu_nama", label: "Nama Ibu" },
   { key: "hb", label: "HB" },
   { key: "albumin", label: "Albumin" },
   { key: "hbsag", label: "HBSAG" },

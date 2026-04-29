@@ -1,16 +1,25 @@
 const {db} = require("../config/db");
-const { validateIbuRelation } = require("./helpers");
+const {
+  isBlank,
+  normalizeDateForDatabase,
+  normalizeRowsDateFieldsForClient,
+  validateIbuRelation,
+} = require("./helpers");
 
 // GET ALL
 const GetDataPemeriksaan = async (req, res, next) => {
   try {
     const query = "SELECT * FROM pemeriksaan_anc";
     const [rows] = await db.execute(query);
+    const normalizedRows = normalizeRowsDateFieldsForClient(rows, [
+      "tanggal_kunjungan",
+      "tanggal_kembali",
+    ]);
 
     return res.status(200).json({
       status: "success",
       message: "Berhasil mengambil data pemeriksaan",
-      data: rows,
+      data: normalizedRows,
     });
   } catch (error) {
     next(error);
@@ -32,7 +41,20 @@ const CreateDataPemeriksaan = async (req, res, next) => {
       tanggal_kembali,
     } = req.body;
 
-    if (!ibu_id || !tanggal_kunjungan || !usia_kehamilan || !tekanan_darah || !berat_badan || !hasil_pemeriksaan || !terapi || !keterangan || !tanggal_kembali) {
+    const normalizedTanggalKunjungan = normalizeDateForDatabase(tanggal_kunjungan);
+    const normalizedTanggalKembali = normalizeDateForDatabase(tanggal_kembali);
+
+    if (
+      isBlank(ibu_id) ||
+      !normalizedTanggalKunjungan ||
+      isBlank(usia_kehamilan) ||
+      isBlank(tekanan_darah) ||
+      isBlank(berat_badan) ||
+      isBlank(hasil_pemeriksaan) ||
+      isBlank(terapi) ||
+      isBlank(keterangan) ||
+      !normalizedTanggalKembali
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -55,14 +77,14 @@ const CreateDataPemeriksaan = async (req, res, next) => {
 
     await db.execute(query, [
       ibu_id,
-      tanggal_kunjungan || "",
+      normalizedTanggalKunjungan,
       usia_kehamilan || "",
       tekanan_darah || "",
       berat_badan || "",
       hasil_pemeriksaan || "",
       terapi || "",
       keterangan || "",
-      tanggal_kembali || "",
+      normalizedTanggalKembali,
     ]);
 
     return res.status(201).json({
@@ -91,7 +113,20 @@ const UpdateDataPemeriksaan = async (req, res, next) => {
       tanggal_kembali,
     } = req.body;
 
-    if (!ibu_id || !tanggal_kunjungan || !usia_kehamilan || !tekanan_darah || !berat_badan || !hasil_pemeriksaan || !terapi || !keterangan || !tanggal_kembali) {
+    const normalizedTanggalKunjungan = normalizeDateForDatabase(tanggal_kunjungan);
+    const normalizedTanggalKembali = normalizeDateForDatabase(tanggal_kembali);
+
+    if (
+      isBlank(ibu_id) ||
+      !normalizedTanggalKunjungan ||
+      isBlank(usia_kehamilan) ||
+      isBlank(tekanan_darah) ||
+      isBlank(berat_badan) ||
+      isBlank(hasil_pemeriksaan) ||
+      isBlank(terapi) ||
+      isBlank(keterangan) ||
+      !normalizedTanggalKembali
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -114,14 +149,14 @@ const UpdateDataPemeriksaan = async (req, res, next) => {
 
     const [result] = await db.execute(query, [
       ibu_id,
-      tanggal_kunjungan || "",
+      normalizedTanggalKunjungan,
       usia_kehamilan || "",
       tekanan_darah || "",
       berat_badan || "",
       hasil_pemeriksaan || "",
       terapi || "",
       keterangan || "",
-      tanggal_kembali || "",
+      normalizedTanggalKembali,
       id,
     ]);
 

@@ -5,18 +5,26 @@ import "../styles/Pemeriksaan.css";
 const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
   { name: "tanggal_kunjungan", label: "Tanggal Kunjungan", type: "date", required: true },
-  { name: "usia_kehamilan", label: "Usia Kehamilan" },
-  { name: "tekanan_darah", label: "Tekanan Darah" },
-  { name: "berat_badan", label: "Berat Badan" },
-  { name: "hasil_pemeriksaan", label: "Hasil Pemeriksaan", type: "textarea" },
-  { name: "terapi", label: "Terapi", type: "textarea" },
-  { name: "keterangan", label: "Keterangan", type: "textarea" },
-  { name: "tanggal_kembali", label: "Tanggal Kembali", type: "date" },
+  { name: "usia_kehamilan", label: "Usia Kehamilan", required: true, numericOnly: true },
+  {
+    name: "tekanan_darah",
+    label: "Tekanan Darah",
+    required: true,
+    validate: (value) =>
+      !value || /^\d+\/\d+$/.test(String(value).trim())
+        ? null
+        : "Tekanan darah hanya boleh berisi angka dengan format seperti 120/80.",
+  },
+  { name: "berat_badan", label: "Berat Badan", required: true, numericOnly: true, allowDecimal: true },
+  { name: "hasil_pemeriksaan", label: "Hasil Pemeriksaan", type: "textarea", required: true },
+  { name: "terapi", label: "Terapi", type: "textarea", required: true },
+  { name: "keterangan", label: "Keterangan", type: "textarea", required: true },
+  { name: "tanggal_kembali", label: "Tanggal Kembali", type: "date", required: true },
 ];
 
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "ibu_id", label: "Ibu ID" },
+  { key: "nomor", label: "Nomor" },
+  { key: "ibu_nama", label: "Nama Ibu" },
   { key: "tanggal_kunjungan", label: "Tgl Kunjungan" },
   { key: "usia_kehamilan", label: "Usia Kehamilan" },
   { key: "tekanan_darah", label: "TD" },

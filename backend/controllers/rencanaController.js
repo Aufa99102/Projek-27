@@ -1,5 +1,5 @@
 const { db } = require("../config/db");
-const { normalizeArrayField, validateIbuRelation } = require("./helpers");
+const { isBlank, normalizeArrayField, validateIbuRelation } = require("./helpers");
 
 // GET ALL
 const GetDataRencana = async (req, res, next) => {
@@ -29,7 +29,14 @@ const CreateDataRencana = async (req, res, next) => {
       calon_donor,
     } = req.body;
 
-    if (!ibu_id || !penolong || !tempat || !pendamping || !transportasi || !calon_donor) {
+    if (
+      isBlank(ibu_id) ||
+      isBlank(penolong) ||
+      isBlank(tempat) ||
+      isBlank(pendamping) ||
+      isBlank(transportasi) ||
+      isBlank(calon_donor)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -84,7 +91,14 @@ const UpdateDataRencana = async (req, res, next) => {
       calon_donor,
     } = req.body;
 
-    if (!ibu_id || !penolong || !tempat || !pendamping || !transportasi || !calon_donor) {
+    if (
+      isBlank(ibu_id) ||
+      isBlank(penolong) ||
+      isBlank(tempat) ||
+      isBlank(pendamping) ||
+      isBlank(transportasi) ||
+      isBlank(calon_donor)
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",

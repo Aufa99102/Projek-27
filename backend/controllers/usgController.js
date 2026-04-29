@@ -1,16 +1,24 @@
 const {db} = require("../config/db");
-const { validateIbuRelation } = require("./helpers");
+const {
+  isBlank,
+  normalizeDateForDatabase,
+  normalizeRowsDateFieldsForClient,
+  validateIbuRelation,
+} = require("./helpers");
 
 // GET ALL
 const GetDataUsg = async (req, res, next) => {
   try {
     const query = "SELECT * FROM usg";
     const [rows] = await db.execute(query);
+    const normalizedRows = normalizeRowsDateFieldsForClient(rows, [
+      "taksiran_persalinan",
+    ]);
 
     return res.status(200).json({
       status: "success",
       message: "Berhasil mengambil data USG",
-      data: rows,
+      data: normalizedRows,
     });
   } catch (error) {
     next(error);
@@ -30,7 +38,17 @@ const CreateDataUsg = async (req, res, next) => {
       taksiran_persalinan,
     } = req.body;
 
-    if (!ibu_id || !trimester || !gs || !crl || !djj || !letak_janin || !taksiran_persalinan) {
+    const normalizedTaksiranPersalinan = normalizeDateForDatabase(taksiran_persalinan);
+
+    if (
+      isBlank(ibu_id) ||
+      isBlank(trimester) ||
+      isBlank(gs) ||
+      isBlank(crl) ||
+      isBlank(djj) ||
+      isBlank(letak_janin) ||
+      !normalizedTaksiranPersalinan
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -58,7 +76,7 @@ const CreateDataUsg = async (req, res, next) => {
       crl || "",
       djj || "",
       letak_janin || "",
-      taksiran_persalinan || "",
+      normalizedTaksiranPersalinan,
     ]);
 
     return res.status(201).json({
@@ -85,7 +103,17 @@ const UpdateDataUsg = async (req, res, next) => {
       taksiran_persalinan,
     } = req.body;
 
-    if (!ibu_id || !trimester || !gs || !crl || !djj || !letak_janin || !taksiran_persalinan) {
+    const normalizedTaksiranPersalinan = normalizeDateForDatabase(taksiran_persalinan);
+
+    if (
+      isBlank(ibu_id) ||
+      isBlank(trimester) ||
+      isBlank(gs) ||
+      isBlank(crl) ||
+      isBlank(djj) ||
+      isBlank(letak_janin) ||
+      !normalizedTaksiranPersalinan
+    ) {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
@@ -113,7 +141,7 @@ const UpdateDataUsg = async (req, res, next) => {
       crl || "",
       djj || "",
       letak_janin || "",
-      taksiran_persalinan || "",
+      normalizedTaksiranPersalinan,
       id,
     ]);
 
