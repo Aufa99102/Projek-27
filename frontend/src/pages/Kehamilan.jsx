@@ -49,7 +49,6 @@ const STATUS_SIFILIS_OPTIONS = [
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-const WEEK_IN_MONTH = 4;
 
 const getStartOfLocalDay = (date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -87,36 +86,39 @@ const hitungUsiaKehamilan = (hpht) => {
   }
 
   const usiaKehamilanMinggu = Math.floor((now - hphtDate) / DAY_IN_MS / 7);
+  const usiaKehamilanHari = Math.floor((now - hphtDate) / DAY_IN_MS);
 
-  if (usiaKehamilanMinggu < 0) {
+  if (usiaKehamilanHari < 0 || usiaKehamilanMinggu < 0) {
     return {
+      hari: null,
       minggu: null,
       bulan: null,
       usia_kehamilan_label: "HPHT belum valid",
     };
   }
 
-  const usiaKehamilanBulan = Math.floor(usiaKehamilanMinggu / WEEK_IN_MONTH);
+  const usiaKehamilanBulan = Math.floor(usiaKehamilanHari / 30);
 
   return {
+    hari: usiaKehamilanHari,
     minggu: usiaKehamilanMinggu,
     bulan: usiaKehamilanBulan,
     usia_kehamilan_label: `${usiaKehamilanMinggu} minggu (${usiaKehamilanBulan} bulan)`,
   };
 };
 
-const tentukanKategoriKehamilan = (usiaKehamilanMinggu) => {
-  if (usiaKehamilanMinggu === null || usiaKehamilanMinggu < 0) {
+const tentukanKategoriKehamilan = (usiaKehamilanBulan) => {
+  if (usiaKehamilanBulan === null || usiaKehamilanBulan < 0) {
     return {
       kategori_kehamilan: "unknown",
       kategori_kehamilan_label: "Belum diketahui",
     };
-  } else if (usiaKehamilanMinggu <= 11) {
+  } else if (usiaKehamilanBulan < 3) {
     return {
       kategori_kehamilan: "kurang_dari_3_bulan",
       kategori_kehamilan_label: "Kurang dari 3 bulan",
     };
-  } else if (usiaKehamilanMinggu <= 27) {
+  } else if (usiaKehamilanBulan < 7) {
     return {
       kategori_kehamilan: "kurang_dari_7_bulan",
       kategori_kehamilan_label: "Kurang dari 7 bulan",
@@ -288,7 +290,7 @@ function Kehamilan() {
             (item) => String(item.id) === String(record.ibu_id)
           );
           const usiaKehamilan = hitungUsiaKehamilan(record.hpht);
-          const kategoriKehamilan = tentukanKategoriKehamilan(usiaKehamilan.minggu);
+          const kategoriKehamilan = tentukanKategoriKehamilan(usiaKehamilan.bulan);
           const trimesterInfo = tentukanTrimester(usiaKehamilan.minggu);
 
           return {
