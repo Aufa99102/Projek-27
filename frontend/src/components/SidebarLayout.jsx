@@ -20,8 +20,8 @@ function SidebarLayout() {
       <aside className="sidebar">
         <div>
           <div className="brand-card">
-            <p className="brand-eyebrow">KIA Care</p>
-            <h1>KIA Care - Sistem NAKES</h1>
+            <p className="brand-eyebrow">KI Care</p>
+            <h1>KI Care - Sistem NAKES</h1>
             <p className="brand-subtitle">
               Pencatatan digital kesehatan ibu hamil untuk tenaga kesehatan.
             </p>

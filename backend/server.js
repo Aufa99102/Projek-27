@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 // ROOT
 app.get("/", (req, res) => {
   res.json({
-    message: "KIA Care API aktif",
+    message: "KI Care API aktif",
   });
 });
 

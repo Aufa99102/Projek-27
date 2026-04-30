@@ -43,7 +43,7 @@ function Welcome() {
         </div>
 
         <div className="welcome-copy">
-          <p className="page-overline">KIA Care</p>
+          <p className="page-overline">KI Care</p>
           <h1>{greeting}</h1>
           <p className="welcome-date">{currentDayLabel}</p>
           <p className="welcome-description">
