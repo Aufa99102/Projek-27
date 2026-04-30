@@ -142,7 +142,7 @@ function Dashboard() {
       <div className="page-header">
         <div>
           <p className="page-overline">Ringkasan Layanan</p>
-          <h2>Dashboard Nakes</h2>
+          <h2>Dashboard NAKES</h2>
           <p>Pantau data ibu hamil, status infeksi, dan kategori kehamilan.</p>
         </div>
       </div>

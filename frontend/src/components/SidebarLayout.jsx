@@ -21,7 +21,7 @@ function SidebarLayout() {
         <div>
           <div className="brand-card">
             <p className="brand-eyebrow">KIA Care</p>
-            <h1>KIA Care - Nakes System</h1>
+            <h1>KIA Care - Sistem NAKES</h1>
             <p className="brand-subtitle">
               Pencatatan digital kesehatan ibu hamil untuk tenaga kesehatan.
             </p>
