@@ -60,23 +60,11 @@ const CreateDataIbu = async (req, res, next) => {
     if (
       isBlank(nama) ||
       !normalizedTanggalLahir ||
-      isBlank(nama_suami) ||
-      isBlank(alamat) ||
-      isBlank(no_hp) ||
-      isBlank(nik) ||
-      isBlank(no_jkn) ||
-      isBlank(no_rekam_medis) ||
-      isBlank(golongan_darah) ||
-      isBlank(hb) ||
-      isBlank(lila) ||
-      isBlank(gds) ||
-      isBlank(status_hiv) ||
-      isBlank(status_sifilis) ||
-      isBlank(status_ibu)
+      isBlank(nik)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
       });
     }
 
@@ -150,23 +138,11 @@ const UpdateDataIbu = async (req, res, next) => {
     if (
       isBlank(nama) ||
       !normalizedTanggalLahir ||
-      isBlank(nama_suami) ||
-      isBlank(alamat) ||
-      isBlank(no_hp) ||
-      isBlank(nik) ||
-      isBlank(no_jkn) ||
-      isBlank(no_rekam_medis) ||
-      isBlank(golongan_darah) ||
-      isBlank(hb) ||
-      isBlank(lila) ||
-      isBlank(gds) ||
-      isBlank(status_hiv) ||
-      isBlank(status_sifilis) ||
-      isBlank(status_ibu)
+      isBlank(nik)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
       });
     }
 

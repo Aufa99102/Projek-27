@@ -45,17 +45,14 @@ const CreateDataKehamilan = async (req, res, next) => {
       isBlank(ibu_id) ||
       !normalizedHpht ||
       !normalizedHpl ||
-      isBlank(jarak_kehamilan) ||
-      isBlank(status_imunisasi) ||
-      isBlank(riwayat_penyakit) ||
       isBlank(bb_sebelum_hamil) ||
       isBlank(imt)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field dasar kehamilan (HPHT, HPL, BB, IMT) wajib terisi",
       });
-}
+    }
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
@@ -116,15 +113,12 @@ const UpdateDataKehamilan = async (req, res, next) => {
       isBlank(ibu_id) ||
       !normalizedHpht ||
       !normalizedHpl ||
-      isBlank(jarak_kehamilan) ||
-      isBlank(status_imunisasi) ||
-      isBlank(riwayat_penyakit) ||
       isBlank(bb_sebelum_hamil) ||
       isBlank(imt)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field dasar kehamilan (HPHT, HPL, BB, IMT) wajib terisi",
       });
     }
 

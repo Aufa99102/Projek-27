@@ -4,20 +4,9 @@ export const PDF_MODULE_REQUIREMENTS = [
     label: "Data Ibu",
     fields: [
       "nama",
-      "tanggal_lahir",
       "nama_suami",
       "alamat",
-      "no_hp",
       "nik",
-      "no_jkn",
-      "no_rekam_medis",
-      "golongan_darah",
-      "hb",
-      "lila",
-      "gds",
-      "status_hiv",
-      "status_sifilis",
-      "status_ibu",
     ],
   },
   {
@@ -96,8 +85,8 @@ export const isRecordComplete = (record, requiredFields = []) => {
 export const isPdfReady = (record, requiredFields = DATA_IBU_REQUIRED_FIELDS) =>
   isRecordComplete(record, requiredFields);
 
-const getLatestCompleteRecord = (records, requiredFields) =>
-  [...records].reverse().find((record) => isRecordComplete(record, requiredFields)) || null;
+const getLatestRecord = (records) =>
+  records.length > 0 ? records[records.length - 1] : null;
 
 export const getPdfReadinessSummary = (ibuRecord, datasets = {}) => {
   const missingModules = [];
@@ -113,13 +102,10 @@ export const getPdfReadinessSummary = (ibuRecord, datasets = {}) => {
     const relatedRecords = (datasets[module.key] || []).filter(
       (record) => String(record.ibu_id) === String(ibuRecord?.id)
     );
-    const completeRecord = getLatestCompleteRecord(relatedRecords, module.fields);
-
-    selectedRecords[module.key] = completeRecord;
-
-    if (!completeRecord) {
-      missingModules.push(module.label);
-    }
+    
+    // We only take the latest record without enforcing it to be fully complete
+    // so that the PDF can still be generated even if some optional fields/modules are missing
+    selectedRecords[module.key] = getLatestRecord(relatedRecords);
   });
 
   return {
@@ -134,7 +120,7 @@ export const formatMissingModulesMessage = (missingModules = []) => {
     return "";
   }
 
-  return `Print kartu ibu belum bisa digunakan. Lengkapi modul berikut terlebih dahulu: ${missingModules.join(
+  return `Print kartu ibu belum bisa diproses. Lengkapi modul wajib berikut terlebih dahulu: ${missingModules.join(
     ", "
   )}.`;
 };

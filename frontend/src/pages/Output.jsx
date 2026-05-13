@@ -23,11 +23,14 @@ const normalizePdfData = (ibu, datasets = {}, selectedRecords = {}) => {
     pemeriksaan: (datasets.pemeriksaan || [])
       .filter((item) => String(item.ibu_id) === String(ibu.id))
       .map((item) => ({
-      tanggal_kunjungan: item.tanggal_kunjungan || "-",
-      usia_kehamilan: item.usia_kehamilan || "-",
-      tekanan_darah: item.tekanan_darah || "-",
-      berat_badan: item.berat_badan || "-",
-      keterangan: item.keterangan || "-",
+      tanggal_kunjungan: item.tanggal_kunjungan || "",
+      usia_kehamilan: item.usia_kehamilan || "",
+      tekanan_darah: item.tekanan_darah || "",
+      berat_badan: item.berat_badan || "",
+      hasil_pemeriksaan: item.hasil_pemeriksaan || "",
+      terapi: item.terapi || "",
+      keterangan: item.keterangan || "",
+      tanggal_kembali: item.tanggal_kembali || "",
       })),
   };
 };

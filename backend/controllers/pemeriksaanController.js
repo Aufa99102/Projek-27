@@ -50,14 +50,11 @@ const CreateDataPemeriksaan = async (req, res, next) => {
       isBlank(usia_kehamilan) ||
       isBlank(tekanan_darah) ||
       isBlank(berat_badan) ||
-      isBlank(hasil_pemeriksaan) ||
-      isBlank(terapi) ||
-      isBlank(keterangan) ||
-      !normalizedTanggalKembali
+      isBlank(hasil_pemeriksaan)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field dasar pemeriksaan (Tanggal, Usia Kehamilan, TD, BB, Hasil) wajib terisi",
       });
     }
 
@@ -122,14 +119,11 @@ const UpdateDataPemeriksaan = async (req, res, next) => {
       isBlank(usia_kehamilan) ||
       isBlank(tekanan_darah) ||
       isBlank(berat_badan) ||
-      isBlank(hasil_pemeriksaan) ||
-      isBlank(terapi) ||
-      isBlank(keterangan) ||
-      !normalizedTanggalKembali
+      isBlank(hasil_pemeriksaan)
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Semua Field wajib terisi",
+        message: "Field dasar pemeriksaan (Tanggal, Usia Kehamilan, TD, BB, Hasil) wajib terisi",
       });
     }
 
