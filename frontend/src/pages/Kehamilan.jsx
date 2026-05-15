@@ -7,7 +7,13 @@ const fields = [
   { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
   { name: "hpht", label: "Tanggal HPHT", type: "date", required: true },
   { name: "hpl", label: "Tanggal HPL", type: "date", required: true },
-  { name: "jarak_kehamilan", label: "Jarak Kehamilan", required: true, numericOnly: true },
+  {
+    name: "jarak_kehamilan",
+    label: "Jarak Kehamilan (tahun)",
+    required: true,
+    numericOnly: true,
+    allowDecimal: true,
+  },
   {
     name: "status_imunisasi",
     label: "Status Imunisasi",
@@ -33,20 +39,8 @@ const KATEGORI_OPTIONS = [
 
 const STATUS_IBU_OPTIONS = [
   { value: "all", label: "Semua Status" },
-  { value: "baru", label: "Ibu hamil baru" },
-  { value: "lama", label: "Ibu hamil lama" },
-];
-
-const STATUS_HIV_OPTIONS = [
-  { value: "all", label: "Semua Status" },
-  { value: "Reaktif", label: "Reaktif" },
-  { value: "Non-reaktif", label: "Non-reaktif" },
-];
-
-const STATUS_SIFILIS_OPTIONS = [
-  { value: "all", label: "Semua Status" },
-  { value: "Positif", label: "Positif" },
-  { value: "Negatif", label: "Negatif" },
+  { value: "Kunjungan Baru", label: "Kunjungan Baru" },
+  { value: "Kunjungan Lama", label: "Kunjungan Lama" },
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -162,22 +156,14 @@ const renderBadge = (label, tone) => (
 
 const getStatusIbuLabel = (value) => {
   if (value === "baru") {
-    return "Ibu hamil baru";
+    return "Kunjungan Baru";
   }
 
   if (value === "lama") {
-    return "Ibu hamil lama";
+    return "Kunjungan Lama";
   }
 
   return value || "Belum diketahui";
-};
-
-const normalizeHivStatus = (value) => {
-  if (value === "Negatif") {
-    return "Non-reaktif";
-  }
-
-  return value || "";
 };
 
 const getKategoriTone = (value) => {
@@ -200,8 +186,6 @@ function Kehamilan() {
   const [filters, setFilters] = useState({
     kategori: "all",
     statusIbu: "all",
-    statusHiv: "all",
-    statusSifilis: "all",
   });
 
   const columns = [
@@ -224,38 +208,14 @@ function Kehamilan() {
       render: (record) =>
         renderBadge(
           getStatusIbuLabel(record.status_ibu),
-          record.status_ibu === "baru" ? "info" : "neutral"
-        ),
-    },
-    {
-      key: "status_hiv",
-      label: "HIV",
-      render: (record) =>
-        renderBadge(
-          record.status_hiv || "Belum diisi",
-          record.status_hiv
-            ? record.status_hiv === "Reaktif"
-              ? "danger"
-              : "success"
-            : "neutral"
-        ),
-    },
-    {
-      key: "status_sifilis",
-      label: "Sifilis",
-      render: (record) =>
-        renderBadge(
-          record.status_sifilis || "Belum diisi",
-          record.status_sifilis
-            ? record.status_sifilis === "Positif"
-              ? "danger"
-              : "success"
+          getStatusIbuLabel(record.status_ibu) === "Kunjungan Baru"
+            ? "info"
             : "neutral"
         ),
     },
     { key: "hpht", label: "Tanggal HPHT" },
     { key: "hpl", label: "Tanggal HPL" },
-    { key: "jarak_kehamilan", label: "Jarak" },
+    { key: "jarak_kehamilan", label: "Jarak (tahun)" },
     { key: "status_imunisasi", label: "Imunisasi" },
     { key: "riwayat_penyakit", label: "Riwayat Penyakit" },
     { key: "bb_sebelum_hamil", label: "BB Awal" },
@@ -273,8 +233,6 @@ function Kehamilan() {
     setFilters({
       kategori: "all",
       statusIbu: "all",
-      statusHiv: "all",
-      statusSifilis: "all",
     });
   };
 
@@ -298,8 +256,6 @@ function Kehamilan() {
             ...record,
             ibu_nama: ibu ? ibu.nama : `Ibu ID ${record.ibu_id}`,
             status_ibu: ibu?.status_ibu || "",
-            status_hiv: normalizeHivStatus(ibu?.status_hiv),
-            status_sifilis: ibu?.status_sifilis || "",
             ...usiaKehamilan,
             ...kategoriKehamilan,
             ...trimesterInfo,
@@ -310,11 +266,7 @@ function Kehamilan() {
             (filters.kategori === "all" ||
               record.kategori_kehamilan === filters.kategori) &&
             (filters.statusIbu === "all" ||
-              record.status_ibu === filters.statusIbu) &&
-            (filters.statusHiv === "all" ||
-              record.status_hiv === filters.statusHiv) &&
-            (filters.statusSifilis === "all" ||
-              record.status_sifilis === filters.statusSifilis)
+              getStatusIbuLabel(record.status_ibu) === filters.statusIbu)
           )
         }
         renderTableControls={({ records, displayedRecords }) => (
@@ -344,23 +296,6 @@ function Kehamilan() {
                 />
               </label>
 
-              <label className="trimester-filter-field">
-                <span>Status HIV</span>
-                <CustomSelect
-                  value={filters.statusHiv}
-                  onChange={(nextValue) => updateFilter("statusHiv", nextValue)}
-                  options={STATUS_HIV_OPTIONS}
-                />
-              </label>
-
-              <label className="trimester-filter-field">
-                <span>Status Sifilis</span>
-                <CustomSelect
-                  value={filters.statusSifilis}
-                  onChange={(nextValue) => updateFilter("statusSifilis", nextValue)}
-                  options={STATUS_SIFILIS_OPTIONS}
-                />
-              </label>
             </div>
 
             <div className="trimester-filter-group">

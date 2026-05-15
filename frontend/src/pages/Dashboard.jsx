@@ -8,7 +8,7 @@ const MONTH_FORMATTER = new Intl.DateTimeFormat("id-ID", {
 });
 
 const STATUS_HIV_ITEMS = [
-  { key: "Non-reaktif", label: "Non-reaktif", tone: "success" },
+  { key: "Non-Reaktif", label: "Non-Reaktif", tone: "success" },
   { key: "Reaktif", label: "Reaktif", tone: "danger" },
 ];
 
@@ -75,6 +75,10 @@ function Dashboard() {
     sifilis: [],
     kategori_kehamilan: [],
     rekap_ibu_bulanan: [],
+    statistik_dashboard: {
+      card_hijau: { label: "Kunjungan Baru", total: 0 },
+      card_merah: { label: "Kunjungan Lama", total: 0 },
+    },
   });
 
   const [loading, setLoading] = useState(true);
@@ -96,6 +100,10 @@ function Dashboard() {
           sifilis: result.data.sifilis ?? [],
           kategori_kehamilan: result.data.kategori_kehamilan ?? [],
           rekap_ibu_bulanan: result.data.rekap_ibu_bulanan ?? [],
+          statistik_dashboard: result.data.statistik_dashboard ?? {
+            card_hijau: { label: "Kunjungan Baru", total: 0 },
+            card_merah: { label: "Kunjungan Lama", total: 0 },
+          },
         });
       } catch (err) {
         setError(err.message);
@@ -119,7 +127,7 @@ function Dashboard() {
 
   const primaryStats = [
     {
-      label: "Total Seluruh Ibu Hamil",
+      label: "Total Ibu",
       value: summary.total_ibu,
       accent: "neutral",
     },
@@ -141,6 +149,21 @@ function Dashboard() {
     { label: "Kunjungan Bulan Ini", value: summary.kunjungan_bulan_ini },
   ];
 
+  const dashboardCards = [
+    {
+      ...summary.statistik_dashboard.card_hijau,
+      tone: "green",
+    },
+    {
+      ...summary.statistik_dashboard.card_merah,
+      tone: "red",
+    },
+  ];
+
+  const handlePrintTotalIbu = () => {
+    window.print();
+  };
+
   return (
     <section className="dashboard-page">
       <div className="page-header">
@@ -149,6 +172,13 @@ function Dashboard() {
           <h2>Dashboard NAKES</h2>
           <p>Pantau data ibu hamil, status infeksi, dan kategori kehamilan.</p>
         </div>
+        <button
+          type="button"
+          className="dashboard-print-button"
+          onClick={handlePrintTotalIbu}
+        >
+          Print Total Ibu
+        </button>
       </div>
 
       {error ? <div className="alert error">{error}</div> : null}
@@ -167,6 +197,19 @@ function Dashboard() {
               </div>
             ) : (
               <strong>{stat.value}</strong>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <div className="dashboard-color-cards">
+        {dashboardCards.map((stat) => (
+          <article key={stat.tone} className={`dashboard-color-card ${stat.tone}`}>
+            <span>{stat.label}</span>
+            {loading ? (
+              <DashboardSkeletonLine className="skeleton-line-value" />
+            ) : (
+              <strong>{stat.total}</strong>
             )}
           </article>
         ))}
@@ -301,7 +344,7 @@ function Dashboard() {
                 <strong>{formatMonthLabel(item.bulan)}</strong>
                 <div className="activity-metrics">
                   <span>Total ibu hamil: {item.total_ibu}</span>
-                  <span>Ibu hamil baru: {item.ibu_baru}</span>
+                  <span>Kunjungan baru: {item.ibu_baru}</span>
                 </div>
               </div>
             ))}

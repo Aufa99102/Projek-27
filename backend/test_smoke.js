@@ -15,6 +15,10 @@ async function smokeTest() {
         nama: "Ibu Test Smoke",
         tanggal_lahir: "1995-05-15",
         nik: "1234567890123456",
+        golongan_darah: "O",
+        status_tt: "1",
+        jenis_kunjungan: "K1",
+        status_ibu: "Kunjungan Baru",
         // sisanya dikosongkan untuk tes opsional
       }),
     });
@@ -65,6 +69,28 @@ async function smokeTest() {
     const periksaData = await periksaRes.json();
     console.log("Response Pemeriksaan:", periksaData);
     if (periksaData.status !== "success") throw new Error("Gagal membuat data pemeriksaan");
+
+    // 4. Uji Create Lab dengan struktur terbaru
+    console.log("\n4. Menguji POST /api/lab (Struktur Baru)...");
+    const labRes = await fetch(`${BASE_URL}/lab`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ibu_id: createdIbu.id,
+        golongan_darah: "O",
+        gds: "98",
+        hiv: "Non-Reaktif",
+        sifilis: "Negatif",
+        hb: "12.1",
+        penyakit: "Tidak ada",
+        protein_urina: "+1",
+        albumin: "Negatif",
+        hbsag: "Non-Reaktif",
+      }),
+    });
+    const labData = await labRes.json();
+    console.log("Response Lab:", labData);
+    if (labData.status !== "success") throw new Error("Gagal membuat data lab");
 
     console.log("\n=== SMOKE TEST BERHASIL ===");
     console.log("Semua validasi API yang dilonggarkan berjalan dengan baik tanpa error 400.");

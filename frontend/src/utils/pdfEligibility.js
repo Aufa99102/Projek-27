@@ -39,7 +39,17 @@ export const PDF_MODULE_REQUIREMENTS = [
   {
     key: "lab",
     label: "Lab",
-    fields: ["hb", "albumin", "hbsag", "hiv"],
+    fields: [
+      "golongan_darah",
+      "gds",
+      "hiv",
+      "sifilis",
+      "hb",
+      "penyakit",
+      "protein_urina",
+      "albumin",
+      "hbsag",
+    ],
   },
   {
     key: "persalinan",

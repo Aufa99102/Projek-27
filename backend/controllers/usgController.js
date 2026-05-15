@@ -6,6 +6,16 @@ const {
   validateIbuRelation,
 } = require("./helpers");
 
+const LETAK_JANIN_OPTIONS = ["Intrauterin", "Ekstrauterin"];
+
+const validateLetakJanin = (value) => {
+  if (isBlank(value) || LETAK_JANIN_OPTIONS.includes(String(value))) {
+    return null;
+  }
+
+  return `Letak janin harus salah satu dari: ${LETAK_JANIN_OPTIONS.join(", ")}`;
+};
+
 // GET ALL
 const GetDataUsg = async (req, res, next) => {
   try {
@@ -52,6 +62,14 @@ const CreateDataUsg = async (req, res, next) => {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
+      });
+    }
+
+    const letakJaninError = validateLetakJanin(letak_janin);
+    if (letakJaninError) {
+      return res.status(400).json({
+        status: "error",
+        message: letakJaninError,
       });
     }
 
@@ -117,6 +135,14 @@ const UpdateDataUsg = async (req, res, next) => {
       return res.status(400).json({
         status: "error",
         message: "Semua Field wajib terisi",
+      });
+    }
+
+    const letakJaninError = validateLetakJanin(letak_janin);
+    if (letakJaninError) {
+      return res.status(400).json({
+        status: "error",
+        message: letakJaninError,
       });
     }
 

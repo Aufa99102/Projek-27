@@ -1,5 +1,20 @@
 const { db } = require("../config/db");
 
+const getTotalIbu = async (req, res, next) => {
+  try {
+    const [rows] = await db.execute("SELECT COUNT(*) AS total FROM ibu");
+
+    return res.status(200).json({
+      status: "success",
+      data: {
+        total_ibu: rows[0]?.total || 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getDashboard = async (req, res, next) => {
   try {
 
@@ -60,7 +75,7 @@ const getDashboard = async (req, res, next) => {
           GROUP BY ibu_id
         ) latest_kehamilan ON latest_kehamilan.latest_id = k1.id
       ) kehamilan_terakhir ON kehamilan_terakhir.ibu_id = i.id
-      WHERE i.status_ibu = 'baru'
+      WHERE i.status_ibu IN ('baru', 'Kunjungan Baru')
       AND MONTH(
         COALESCE(
           NULLIF(kehamilan_terakhir.hpht, '0000-00-00'),
@@ -75,11 +90,17 @@ const getDashboard = async (req, res, next) => {
       ) = YEAR(CURRENT_DATE())
     `);
 
+    const [ibuLama] = await db.execute(`
+      SELECT COUNT(*) AS total
+      FROM ibu
+      WHERE status_ibu IN ('lama', 'Kunjungan Lama')
+    `);
+
     const [rekapIbu] = await db.execute(`
       SELECT 
         DATE_FORMAT(source_date, '%Y-%m') AS bulan,
         COUNT(*) AS total_ibu,
-        SUM(CASE WHEN status_ibu = 'baru' THEN 1 ELSE 0 END) AS ibu_baru
+        SUM(CASE WHEN status_ibu IN ('baru', 'Kunjungan Baru') THEN 1 ELSE 0 END) AS ibu_baru
       FROM (
         SELECT
           i.id,
@@ -107,18 +128,22 @@ const getDashboard = async (req, res, next) => {
     const [hiv] = await db.execute(`
       SELECT
         CASE
-          WHEN status_hiv = 'Negatif' THEN 'Non-reaktif'
-          ELSE status_hiv
+          WHEN hiv IN ('Negatif', 'Non-reaktif', 'Non-Reaktif') THEN 'Non-Reaktif'
+          ELSE hiv
         END AS status_hiv,
         COUNT(*) AS total
-      FROM ibu
-      GROUP BY status_hiv
+      FROM lab
+      GROUP BY
+        CASE
+          WHEN hiv IN ('Negatif', 'Non-reaktif', 'Non-Reaktif') THEN 'Non-Reaktif'
+          ELSE hiv
+        END
     `);
 
     const [sifilis] = await db.execute(`
-      SELECT status_sifilis, COUNT(*) AS total
-      FROM ibu
-      GROUP BY status_sifilis
+      SELECT sifilis AS status_sifilis, COUNT(*) AS total
+      FROM lab
+      GROUP BY sifilis
     `);
 
     const [kategoriKehamilan] = await db.execute(`
@@ -160,6 +185,18 @@ const getDashboard = async (req, res, next) => {
         total_usg: usg[0]?.total || 0,
         kunjungan_bulan_ini: kunjunganBulanIni[0]?.total || 0,
         ibu_baru_bulan_ini: ibuBaru[0]?.total || 0,
+        ibu_lama: ibuLama[0]?.total || 0,
+
+        statistik_dashboard: {
+          card_hijau: {
+            label: "Kunjungan Baru",
+            total: ibuBaru[0]?.total || 0,
+          },
+          card_merah: {
+            label: "Kunjungan Lama",
+            total: ibuLama[0]?.total || 0,
+          },
+        },
 
         rekap_ibu_bulanan: rekapIbu,
 
@@ -175,4 +212,4 @@ const getDashboard = async (req, res, next) => {
   }
 };
 
-module.exports = { getDashboard };
+module.exports = { getDashboard, getTotalIbu };

@@ -192,12 +192,12 @@ const KartuIbuHamilPDF = ({ data = {} }) => {
             <View style={styles.rowFlex}>
               <Text style={styles.labelId}>Jarak Kehamilan</Text>
               <Text style={styles.colon}>:</Text>
-              <Text style={styles.valueId}>{data.kehamilan?.jarak_kehamilan || "...... Thn ...... Bln"}</Text>
+              <Text style={styles.valueId}>{data.kehamilan?.jarak_kehamilan ? `${data.kehamilan.jarak_kehamilan} tahun` : ""}</Text>
             </View>
             <View style={styles.rowFlex}>
               <Text style={styles.labelId}>Status Imunisasi TT</Text>
               <Text style={styles.colon}>:</Text>
-              <Text style={styles.valueId}>{data.kehamilan?.status_imunisasi || ""}</Text>
+              <Text style={styles.valueId}>{data.status_tt || data.kehamilan?.status_imunisasi || ""}</Text>
             </View>
             <View style={styles.rowFlex}>
               <Text style={styles.labelId}>BB Sebelum Hamil</Text>
@@ -218,6 +218,21 @@ const KartuIbuHamilPDF = ({ data = {} }) => {
               <Text style={styles.labelId}>Albumin</Text>
               <Text style={styles.colon}>:</Text>
               <Text style={styles.valueId}>{data.lab?.albumin || ""}</Text>
+            </View>
+            <View style={styles.rowFlex}>
+              <Text style={styles.labelId}>GDS</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.valueId}>{data.lab?.gds || ""}</Text>
+            </View>
+            <View style={styles.rowFlex}>
+              <Text style={styles.labelId}>Sifilis</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.valueId}>{data.lab?.sifilis || ""}</Text>
+            </View>
+            <View style={styles.rowFlex}>
+              <Text style={styles.labelId}>Protein Urina</Text>
+              <Text style={styles.colon}>:</Text>
+              <Text style={styles.valueId}>{data.lab?.protein_urina || ""}</Text>
             </View>
             <View style={styles.rowFlex}>
               <Text style={styles.labelId}>HBsAg</Text>

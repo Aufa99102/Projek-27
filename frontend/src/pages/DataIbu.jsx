@@ -40,14 +40,9 @@ const renderBadge = (label, tone) => (
 );
 
 const getStatusIbuLabel = (value) => {
-  if (value === "baru") return "Ibu hamil baru";
-  if (value === "lama") return "Ibu hamil lama";
+  if (value === "baru" || value === "Kunjungan Baru") return "Kunjungan Baru";
+  if (value === "lama" || value === "Kunjungan Lama") return "Kunjungan Lama";
   return value || "-";
-};
-
-const normalizeHivStatus = (value) => {
-  if (value === "Negatif") return "Non-reaktif";
-  return value || "";
 };
 
 const fields = [
@@ -119,37 +114,29 @@ const fields = [
     required: true,
     options: ["A", "B", "AB", "O"],
   },
-  { name: "hb", label: "HB", type: "number", required: true, allowDecimal: true },
   { name: "lila", label: "LILA", type: "number", required: true, allowDecimal: true },
-  { name: "gds", label: "GDS", type: "number", required: true, allowDecimal: true },
   {
-    name: "status_hiv",
-    label: "Status HIV",
+    name: "status_tt",
+    label: "Status TT",
     type: "select",
     required: true,
-    options: [
-      { value: "Non-reaktif", label: "Non-reaktif" },
-      { value: "Reaktif", label: "Reaktif" },
-    ],
+    options: ["1", "2", "3", "4", "5"],
   },
   {
-    name: "status_sifilis",
-    label: "Status Sifilis",
+    name: "jenis_kunjungan",
+    label: "Jenis Kunjungan",
     type: "select",
     required: true,
-    options: [
-      { value: "Negatif", label: "Negatif" },
-      { value: "Positif", label: "Positif" },
-    ],
+    options: ["K1", "K6", "K8"],
   },
   {
     name: "status_ibu",
-    label: "Status Ibu",
+    label: "Status Kunjungan",
     type: "select",
     required: true,
     options: [
-      { value: "baru", label: "Ibu hamil baru" },
-      { value: "lama", label: "Ibu hamil lama" },
+      { value: "Kunjungan Baru", label: "Kunjungan Baru" },
+      { value: "Kunjungan Lama", label: "Kunjungan Lama" },
     ],
   },
 ];
@@ -163,35 +150,13 @@ const columns = [
     render: (record) =>
       renderBadge(
         getStatusIbuLabel(record.status_ibu),
-        record.status_ibu === "baru" ? "info" : "neutral"
-      ),
-  },
-  {
-    key: "status_hiv",
-    label: "HIV",
-    render: (record) =>
-      renderBadge(
-        record.status_hiv || "Belum diisi",
-        record.status_hiv
-          ? record.status_hiv === "Reaktif"
-            ? "danger"
-            : "success"
+        record.status_ibu === "Kunjungan Baru" || record.status_ibu === "baru"
+          ? "info"
           : "neutral"
       ),
   },
-  {
-    key: "status_sifilis",
-    label: "Sifilis",
-    render: (record) =>
-      renderBadge(
-        record.status_sifilis || "Belum diisi",
-        record.status_sifilis
-          ? record.status_sifilis === "Positif"
-            ? "danger"
-            : "success"
-          : "neutral"
-      ),
-  },
+  { key: "jenis_kunjungan", label: "Jenis Kunjungan" },
+  { key: "status_tt", label: "TT" },
   { key: "tanggal_lahir", label: "Tanggal Lahir" },
   { key: "nama_suami", label: "Suami" },
   { key: "alamat", label: "Alamat" },
@@ -200,16 +165,13 @@ const columns = [
   { key: "no_jkn", label: "No JKN" },
   { key: "no_rekam_medis", label: "No RM" },
   { key: "golongan_darah", label: "Golda" },
-  { key: "hb", label: "HB" },
   { key: "lila", label: "LILA" },
-  { key: "gds", label: "GDS" },
 ];
 function DataIbu() {
   const [filters, setFilters] = useState({
     search: "",
     statusIbu: "all",
-    statusHiv: "all",
-    statusSifilis: "all",
+    jenisKunjungan: "all",
   });
 
   const updateFilter = (name, value) => {
@@ -223,8 +185,7 @@ function DataIbu() {
     setFilters({
       search: "",
       statusIbu: "all",
-      statusHiv: "all",
-      statusSifilis: "all",
+      jenisKunjungan: "all",
     });
   };
 
@@ -257,10 +218,10 @@ function DataIbu() {
 
             return (
               matchesKeyword &&
-              (filters.statusIbu === "all" || record.status_ibu === filters.statusIbu) &&
-              (filters.statusHiv === "all" || record.status_hiv === filters.statusHiv) &&
-              (filters.statusSifilis === "all" ||
-                record.status_sifilis === filters.statusSifilis)
+              (filters.statusIbu === "all" ||
+                getStatusIbuLabel(record.status_ibu) === filters.statusIbu) &&
+              (filters.jenisKunjungan === "all" ||
+                record.jenis_kunjungan === filters.jenisKunjungan)
             );
           });
         }}
@@ -291,34 +252,22 @@ function DataIbu() {
                   onChange={(nextValue) => updateFilter("statusIbu", nextValue)}
                   options={[
                     { value: "all", label: "Semua Status" },
-                    { value: "baru", label: "Ibu hamil baru" },
-                    { value: "lama", label: "Ibu hamil lama" },
+                    { value: "Kunjungan Baru", label: "Kunjungan Baru" },
+                    { value: "Kunjungan Lama", label: "Kunjungan Lama" },
                   ]}
                 />
               </label>
 
               <label className="data-ibu-filter-field">
-                <span>Status HIV</span>
+                <span>Jenis Kunjungan</span>
                 <CustomSelect
-                  value={filters.statusHiv}
-                  onChange={(nextValue) => updateFilter("statusHiv", nextValue)}
+                  value={filters.jenisKunjungan}
+                  onChange={(nextValue) => updateFilter("jenisKunjungan", nextValue)}
                   options={[
-                    { value: "all", label: "Semua Status" },
-                    { value: "Non-reaktif", label: "Non-reaktif" },
-                    { value: "Reaktif", label: "Reaktif" },
-                  ]}
-                />
-              </label>
-
-              <label className="data-ibu-filter-field">
-                <span>Status Sifilis</span>
-                <CustomSelect
-                  value={filters.statusSifilis}
-                  onChange={(nextValue) => updateFilter("statusSifilis", nextValue)}
-                  options={[
-                    { value: "all", label: "Semua Status" },
-                    { value: "Negatif", label: "Negatif" },
-                    { value: "Positif", label: "Positif" },
+                    { value: "all", label: "Semua Jenis" },
+                    { value: "K1", label: "K1" },
+                    { value: "K6", label: "K6" },
+                    { value: "K8", label: "K8" },
                   ]}
                 />
               </label>
@@ -335,10 +284,6 @@ function DataIbu() {
             </div>
           </div>
         )}
-        transformRecord={(record) => ({
-          ...record,
-          status_hiv: normalizeHivStatus(record.status_hiv),
-        })}
       />
     </div>
   );

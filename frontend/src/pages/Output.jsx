@@ -14,8 +14,9 @@ const normalizePdfData = (ibu, datasets = {}, selectedRecords = {}) => {
 
   return {
     ...ibu,
-    hb: ibu.hb || latestLab.hb || "-",
-    status_hiv: ibu.status_hiv || latestLab.hiv || "-",
+    golongan_darah: latestLab.golongan_darah || ibu.golongan_darah || "-",
+    hb: latestLab.hb || "-",
+    status_hiv: latestLab.hiv || "-",
     kehamilan: selectedRecords.kehamilan || null,
     lab: selectedRecords.lab || null,
     persalinan: selectedRecords.persalinan || null,
@@ -138,10 +139,12 @@ function Output() {
       {
         label: "Status Ibu",
         value:
-          selectedIbu.status_ibu === "baru"
-            ? "Ibu hamil baru"
-            : selectedIbu.status_ibu === "lama"
-            ? "Ibu hamil lama"
+          selectedIbu.status_ibu === "baru" ||
+          selectedIbu.status_ibu === "Kunjungan Baru"
+            ? "Kunjungan Baru"
+            : selectedIbu.status_ibu === "lama" ||
+              selectedIbu.status_ibu === "Kunjungan Lama"
+            ? "Kunjungan Lama"
             : "-",
       },
       {

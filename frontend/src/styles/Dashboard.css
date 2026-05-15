@@ -3,6 +3,26 @@
   gap: 1.3rem;
 }
 
+.dashboard-page .page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-print-button {
+  position: relative;
+  z-index: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  background: #ffffff;
+  color: #8f4f72;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(171, 130, 153, 0.12);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -11,6 +31,40 @@
 
 .stats-grid-primary {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.dashboard-color-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-color-card {
+  display: grid;
+  gap: 0.45rem;
+  border-radius: 8px;
+  padding: 1.15rem;
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(53, 64, 77, 0.12);
+}
+
+.dashboard-color-card.green {
+  background: linear-gradient(135deg, #138a52, #42b883);
+}
+
+.dashboard-color-card.red {
+  background: linear-gradient(135deg, #b4233f, #e35d6a);
+}
+
+.dashboard-color-card span {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.dashboard-color-card strong {
+  font-family: var(--heading-font);
+  font-size: 2.7rem;
+  line-height: 1;
 }
 
 .stat-card,
@@ -333,8 +387,18 @@
 
 @media (max-width: 640px) {
   .stats-grid,
-  .stats-grid-primary {
+  .stats-grid-primary,
+  .dashboard-color-cards {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-page .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dashboard-print-button {
+    width: 100%;
   }
 
   .section-heading {
@@ -349,5 +413,29 @@
 
   .dashboard-badge {
     min-width: 100%;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .dashboard-page,
+  .dashboard-page * {
+    visibility: visible;
+  }
+
+  .dashboard-page {
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    background: #ffffff;
+  }
+
+  .dashboard-print-button,
+  .dashboard-grid,
+  .activity-card {
+    display: none !important;
   }
 }
