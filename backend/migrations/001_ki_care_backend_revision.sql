@@ -7,12 +7,12 @@ ALTER TABLE ibu
 
 ALTER TABLE ibu
   MODIFY COLUMN golongan_darah ENUM('A','B','AB','O') NULL,
-  MODIFY COLUMN status_ibu ENUM('Kunjungan Baru','Kunjungan Lama','baru','lama') NOT NULL DEFAULT 'Kunjungan Baru';
+  MODIFY COLUMN status_ibu ENUM('Kunjungan Baru','Lama Kunjungan','Kunjungan Lama','baru','lama') NOT NULL DEFAULT 'Kunjungan Baru';
 
 UPDATE ibu
 SET status_ibu = CASE
   WHEN status_ibu = 'baru' THEN 'Kunjungan Baru'
-  WHEN status_ibu = 'lama' THEN 'Kunjungan Lama'
+  WHEN status_ibu IN ('lama', 'Kunjungan Lama') THEN 'Lama Kunjungan'
   ELSE status_ibu
 END;
 

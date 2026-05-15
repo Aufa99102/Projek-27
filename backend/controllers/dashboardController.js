@@ -90,12 +90,6 @@ const getDashboard = async (req, res, next) => {
       ) = YEAR(CURRENT_DATE())
     `);
 
-    const [ibuLama] = await db.execute(`
-      SELECT COUNT(*) AS total
-      FROM ibu
-      WHERE status_ibu IN ('lama', 'Kunjungan Lama')
-    `);
-
     const [rekapIbu] = await db.execute(`
       SELECT 
         DATE_FORMAT(source_date, '%Y-%m') AS bulan,
@@ -185,18 +179,6 @@ const getDashboard = async (req, res, next) => {
         total_usg: usg[0]?.total || 0,
         kunjungan_bulan_ini: kunjunganBulanIni[0]?.total || 0,
         ibu_baru_bulan_ini: ibuBaru[0]?.total || 0,
-        ibu_lama: ibuLama[0]?.total || 0,
-
-        statistik_dashboard: {
-          card_hijau: {
-            label: "Kunjungan Baru",
-            total: ibuBaru[0]?.total || 0,
-          },
-          card_merah: {
-            label: "Kunjungan Lama",
-            total: ibuLama[0]?.total || 0,
-          },
-        },
 
         rekap_ibu_bulanan: rekapIbu,
 

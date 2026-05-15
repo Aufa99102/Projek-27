@@ -39,9 +39,13 @@ const renderBadge = (label, tone) => (
   <span className={`status-badge ${tone}`}>{label}</span>
 );
 
+const JENIS_KUNJUNGAN_OPTIONS = ["K1", "K6", "K8"];
+
 const getStatusIbuLabel = (value) => {
   if (value === "baru" || value === "Kunjungan Baru") return "Kunjungan Baru";
-  if (value === "lama" || value === "Kunjungan Lama") return "Kunjungan Lama";
+  if (value === "lama" || value === "Kunjungan Lama" || value === "Lama Kunjungan") {
+    return "Lama Kunjungan";
+  }
   return value || "-";
 };
 
@@ -127,7 +131,7 @@ const fields = [
     label: "Jenis Kunjungan",
     type: "select",
     required: true,
-    options: ["K1", "K6", "K8"],
+    options: JENIS_KUNJUNGAN_OPTIONS,
   },
   {
     name: "status_ibu",
@@ -136,7 +140,7 @@ const fields = [
     required: true,
     options: [
       { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-      { value: "Kunjungan Lama", label: "Kunjungan Lama" },
+      { value: "Lama Kunjungan", label: "Lama Kunjungan" },
     ],
   },
 ];
@@ -253,24 +257,36 @@ function DataIbu() {
                   options={[
                     { value: "all", label: "Semua Status" },
                     { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-                    { value: "Kunjungan Lama", label: "Kunjungan Lama" },
+                    { value: "Lama Kunjungan", label: "Lama Kunjungan" },
                   ]}
                 />
               </label>
 
-              <label className="data-ibu-filter-field">
+              <div className="data-ibu-filter-field">
                 <span>Jenis Kunjungan</span>
-                <CustomSelect
-                  value={filters.jenisKunjungan}
-                  onChange={(nextValue) => updateFilter("jenisKunjungan", nextValue)}
-                  options={[
-                    { value: "all", label: "Semua Jenis" },
-                    { value: "K1", label: "K1" },
-                    { value: "K6", label: "K6" },
-                    { value: "K8", label: "K8" },
-                  ]}
-                />
-              </label>
+                <div className="data-ibu-visit-filter" role="group" aria-label="Filter jenis kunjungan">
+                  {[
+                    { value: "all", label: "Semua" },
+                    ...JENIS_KUNJUNGAN_OPTIONS.map((item) => ({
+                      value: item,
+                      label: item,
+                    })),
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={
+                        filters.jenisKunjungan === option.value
+                          ? "data-ibu-visit-button active"
+                          : "data-ibu-visit-button"
+                      }
+                      onClick={() => updateFilter("jenisKunjungan", option.value)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="data-ibu-filter-actions">

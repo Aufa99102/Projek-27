@@ -75,10 +75,6 @@ function Dashboard() {
     sifilis: [],
     kategori_kehamilan: [],
     rekap_ibu_bulanan: [],
-    statistik_dashboard: {
-      card_hijau: { label: "Kunjungan Baru", total: 0 },
-      card_merah: { label: "Kunjungan Lama", total: 0 },
-    },
   });
 
   const [loading, setLoading] = useState(true);
@@ -100,10 +96,6 @@ function Dashboard() {
           sifilis: result.data.sifilis ?? [],
           kategori_kehamilan: result.data.kategori_kehamilan ?? [],
           rekap_ibu_bulanan: result.data.rekap_ibu_bulanan ?? [],
-          statistik_dashboard: result.data.statistik_dashboard ?? {
-            card_hijau: { label: "Kunjungan Baru", total: 0 },
-            card_merah: { label: "Kunjungan Lama", total: 0 },
-          },
         });
       } catch (err) {
         setError(err.message);
@@ -149,17 +141,6 @@ function Dashboard() {
     { label: "Kunjungan Bulan Ini", value: summary.kunjungan_bulan_ini },
   ];
 
-  const dashboardCards = [
-    {
-      ...summary.statistik_dashboard.card_hijau,
-      tone: "green",
-    },
-    {
-      ...summary.statistik_dashboard.card_merah,
-      tone: "red",
-    },
-  ];
-
   const handlePrintTotalIbu = () => {
     window.print();
   };
@@ -197,19 +178,6 @@ function Dashboard() {
               </div>
             ) : (
               <strong>{stat.value}</strong>
-            )}
-          </article>
-        ))}
-      </div>
-
-      <div className="dashboard-color-cards">
-        {dashboardCards.map((stat) => (
-          <article key={stat.tone} className={`dashboard-color-card ${stat.tone}`}>
-            <span>{stat.label}</span>
-            {loading ? (
-              <DashboardSkeletonLine className="skeleton-line-value" />
-            ) : (
-              <strong>{stat.total}</strong>
             )}
           </article>
         ))}

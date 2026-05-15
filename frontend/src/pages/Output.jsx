@@ -144,7 +144,7 @@ function Output() {
             ? "Kunjungan Baru"
             : selectedIbu.status_ibu === "lama" ||
               selectedIbu.status_ibu === "Kunjungan Lama"
-            ? "Kunjungan Lama"
+            ? "Lama Kunjungan"
             : "-",
       },
       {

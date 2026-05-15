@@ -8,11 +8,17 @@ const {
 const GOLDAR_OPTIONS = ["A", "B", "AB", "O"];
 const STATUS_TT_OPTIONS = ["1", "2", "3", "4", "5"];
 const JENIS_KUNJUNGAN_OPTIONS = ["K1", "K6", "K8"];
-const STATUS_IBU_OPTIONS = ["Kunjungan Baru", "Kunjungan Lama", "baru", "lama"];
+const STATUS_IBU_OPTIONS = [
+  "Kunjungan Baru",
+  "Lama Kunjungan",
+  "Kunjungan Lama",
+  "baru",
+  "lama",
+];
 
 const normalizeStatusIbu = (value) => {
   if (value === "baru") return "Kunjungan Baru";
-  if (value === "lama") return "Kunjungan Lama";
+  if (value === "lama" || value === "Kunjungan Lama") return "Lama Kunjungan";
   return value || "Kunjungan Baru";
 };
 

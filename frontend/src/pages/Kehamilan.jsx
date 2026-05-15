@@ -40,7 +40,7 @@ const KATEGORI_OPTIONS = [
 const STATUS_IBU_OPTIONS = [
   { value: "all", label: "Semua Status" },
   { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-  { value: "Kunjungan Lama", label: "Kunjungan Lama" },
+  { value: "Lama Kunjungan", label: "Lama Kunjungan" },
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -159,8 +159,8 @@ const getStatusIbuLabel = (value) => {
     return "Kunjungan Baru";
   }
 
-  if (value === "lama") {
-    return "Kunjungan Lama";
+  if (value === "lama" || value === "Kunjungan Lama") {
+    return "Lama Kunjungan";
   }
 
   return value || "Belum diketahui";
