@@ -35,6 +35,9 @@ function Welcome() {
     <section className="welcome-page">
       <div className="welcome-card">
         <div className="welcome-media">
+          <div className="welcome-media-gradient" aria-hidden="true" />
+          <div className="welcome-heartbeat-ring welcome-heartbeat-ring-one" aria-hidden="true" />
+          <div className="welcome-heartbeat-ring welcome-heartbeat-ring-two" aria-hidden="true" />
           <img
             src={pregnantPhotoshoot}
             alt="Foto ibu hamil"
@@ -43,16 +46,23 @@ function Welcome() {
         </div>
 
         <div className="welcome-copy">
-          <p className="page-overline">KI Care</p>
-          <h1>{greeting}</h1>
-          <p className="welcome-date">{currentDayLabel}</p>
-          <p className="welcome-description">
+          <p className="page-overline welcome-reveal welcome-reveal-overline">KI-DIGITAL</p>
+          <h1 className="welcome-reveal welcome-reveal-title">{greeting}</h1>
+          <p className="welcome-date welcome-reveal welcome-reveal-date">{currentDayLabel}</p>
+          <p className="welcome-description welcome-reveal welcome-reveal-description">
             Selamat datang di sistem pencatatan kesehatan ibu hamil. Tekan
             tombol mulai untuk masuk ke dashboard utama.
           </p>
-          <Link to="/dashboard" className="primary-button welcome-button">
-            Mulai
-          </Link>
+          <div className="welcome-actions welcome-reveal welcome-reveal-actions">
+            <Link to="/dashboard" className="primary-button welcome-button">
+              Mulai
+            </Link>
+          </div>
+          <div className="welcome-floating-card" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
         </div>
       </div>
     </section>

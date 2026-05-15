@@ -1,33 +1,66 @@
 .app-shell {
   display: grid;
-  grid-template-columns: clamp(220px, 18vw, 270px) minmax(0, 1fr);
+  grid-template-columns: clamp(240px, 19vw, 290px) minmax(0, 1fr);
   min-height: 100vh;
   isolation: isolate;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 .sidebar {
+  position: sticky;
+  top: 1rem;
+  min-height: calc(100vh - 2rem);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 1.3rem;
+  overflow: hidden;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 26%),
-    linear-gradient(180deg, #ff9ac6 0%, #f472b6 45%, #df5a9b 100%);
-  color: #fff7fb;
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.28), transparent 30%),
+    linear-gradient(180deg, rgba(232, 175, 199, 0.98) 0%, rgba(222, 166, 193, 0.98) 42%, rgba(209, 174, 199, 0.98) 100%);
+  color: #ffffff;
+  box-shadow: 0 18px 34px rgba(171, 130, 153, 0.16);
+}
+
+.sidebar-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .brand-card {
-  padding: 1.25rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+  padding: 1.4rem;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.16));
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.brand-card::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  width: 72px;
+  height: 16px;
+  border-radius: 6px;
+  background: rgba(255, 245, 221, 0.52);
+  transform: rotate(-4deg);
 }
 
 .brand-card h1 {
   margin: 0.25rem 0 0.75rem;
-  font-size: 1.45rem;
-  line-height: 1.25;
+  max-width: 10ch;
+  font-family: var(--heading-font);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   overflow-wrap: anywhere;
 }
 
@@ -37,89 +70,271 @@
 }
 
 .brand-eyebrow {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.86);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 .brand-subtitle {
-  color: #ffe8f3;
-  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.94rem;
+  max-width: 24ch;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-glow {
+  position: absolute;
+  right: -2rem;
+  bottom: -2rem;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0));
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 1.5rem;
+  gap: 0.6rem;
+  margin-top: 1.8rem;
 }
 
 .nav-link {
-  padding: 0.85rem 1rem;
-  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0.95rem 1rem;
+  border-radius: 20px;
   color: #ffffff;
-  transition: background 0.2s ease, transform 0.2s ease;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
-  transform: translateX(2px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.22));
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateX(3px);
+  box-shadow: 0 10px 18px rgba(171, 130, 153, 0.14);
 }
 
 .content-area {
   position: relative;
   overflow: hidden;
-  padding: 2rem;
+  padding: 1.2rem;
   background: transparent;
   min-width: 0;
+  border-radius: 38px;
+  perspective: 1800px;
 }
 
-.content-area::before,
-.content-area::after {
-  content: "";
+.content-backdrop {
   position: absolute;
-  inset: auto;
   pointer-events: none;
   z-index: -1;
-  background-image: url("../assets/pink-flowers.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: saturate(1.04);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+.content-backdrop-one {
+  top: -4rem;
+  right: -6rem;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(232, 175, 199, 0.22), rgba(232, 175, 199, 0));
+}
+
+.content-backdrop-two {
+  left: -5rem;
+  bottom: -5rem;
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(175, 200, 231, 0.12), rgba(175, 200, 231, 0));
 }
 
 .content-area::before {
+  content: "";
+  position: absolute;
   top: -1rem;
   right: -3rem;
   width: min(34vw, 460px);
   height: min(82vh, 920px);
   opacity: 0.16;
+  pointer-events: none;
+  z-index: -1;
+  background-image: url("../assets/pink-flowers.png");
+  background-repeat: no-repeat;
+  background-size: contain;
   background-position: top right;
 }
 
 .content-area::after {
+  content: "";
+  position: absolute;
   left: -3.5rem;
   bottom: -2rem;
   width: min(30vw, 400px);
   height: min(72vh, 760px);
   opacity: 0.12;
+  pointer-events: none;
+  z-index: -1;
+  background-image: url("../assets/pink-flowers.png");
+  background-repeat: no-repeat;
+  background-size: contain;
   background-position: bottom left;
   transform: scaleX(-1) rotate(-10deg);
+}
+
+.page-transition-shell {
+  position: relative;
+  transform-origin: 50% 14%;
+  will-change: transform, opacity, filter;
+}
+
+.page-transition-paper {
+  position: relative;
+  min-height: calc(100vh - 4.4rem);
+  transform-origin: top center;
+}
+
+.page-transition-shadow {
+  position: absolute;
+  inset: 0.5rem 1rem auto;
+  height: 22px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(160, 133, 149, 0.16), rgba(160, 133, 149, 0));
+  filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page-transition-tape {
+  position: absolute;
+  top: -0.35rem;
+  z-index: 3;
+  width: 86px;
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(255, 251, 236, 0.7), rgba(255, 244, 216, 0.52));
+  border: 1px solid rgba(230, 214, 176, 0.26);
+  box-shadow: 0 4px 10px rgba(182, 167, 135, 0.08);
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.page-transition-tape-left {
+  left: 3rem;
+  transform: rotate(-5deg);
+}
+
+.page-transition-tape-right {
+  right: 3.5rem;
+  transform: rotate(4deg);
+}
+
+.page-transition-shell.page-exit {
+  animation: scrapbookPageExit 240ms cubic-bezier(0.4, 0.05, 0.8, 0.2) forwards;
+}
+
+.page-transition-shell.page-exit .page-transition-paper {
+  animation: scrapbookPaperExit 240ms cubic-bezier(0.4, 0.05, 0.8, 0.2) forwards;
+}
+
+.page-transition-shell.page-enter {
+  animation: scrapbookPageEnter 460ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.page-transition-shell.page-enter .page-transition-paper {
+  animation: scrapbookPaperEnter 460ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.page-transition-shell.page-enter .page-transition-shadow,
+.page-transition-shell.page-exit .page-transition-shadow {
+  opacity: 1;
+}
+
+@keyframes scrapbookPageExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+    filter: blur(3px);
+  }
+}
+
+@keyframes scrapbookPaperExit {
+  0% {
+    transform: rotate(0deg) rotateX(0deg);
+  }
+  100% {
+    transform: rotate(-1.1deg) rotateX(8deg);
+  }
+}
+
+@keyframes scrapbookPageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+    filter: blur(3px);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.002);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes scrapbookPaperEnter {
+  0% {
+    transform: rotate(1.4deg) rotateX(-10deg);
+  }
+  55% {
+    transform: rotate(-0.5deg) rotateX(2deg);
+  }
+  100% {
+    transform: rotate(0deg) rotateX(0deg);
+  }
 }
 
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
+    padding: 0.75rem;
   }
 
   .sidebar {
+    position: static;
+    min-height: auto;
     gap: 1.5rem;
   }
 
   .content-area {
-    padding: 1rem;
+    padding: 0.5rem;
+  }
+
+  .page-transition-paper {
+    min-height: auto;
+  }
+
+  .page-transition-tape-left {
+    left: 1.5rem;
+  }
+
+  .page-transition-tape-right {
+    right: 1.5rem;
   }
 
   .content-area::before {

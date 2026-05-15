@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import CustomSelect from "../components/CustomSelect";
 import EntityPage from "../components/EntityPage";
 import "../styles/DataIbu.css";
 
@@ -285,40 +286,41 @@ function DataIbu() {
 
               <label className="data-ibu-filter-field">
                 <span>Status Ibu</span>
-                <select
+                <CustomSelect
                   value={filters.statusIbu}
-                  onChange={(event) => updateFilter("statusIbu", event.target.value)}
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="baru">Ibu hamil baru</option>
-                  <option value="lama">Ibu hamil lama</option>
-                </select>
+                  onChange={(nextValue) => updateFilter("statusIbu", nextValue)}
+                  options={[
+                    { value: "all", label: "Semua Status" },
+                    { value: "baru", label: "Ibu hamil baru" },
+                    { value: "lama", label: "Ibu hamil lama" },
+                  ]}
+                />
               </label>
 
               <label className="data-ibu-filter-field">
                 <span>Status HIV</span>
-                <select
+                <CustomSelect
                   value={filters.statusHiv}
-                  onChange={(event) => updateFilter("statusHiv", event.target.value)}
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="Non-reaktif">Non-reaktif</option>
-                  <option value="Reaktif">Reaktif</option>
-                </select>
+                  onChange={(nextValue) => updateFilter("statusHiv", nextValue)}
+                  options={[
+                    { value: "all", label: "Semua Status" },
+                    { value: "Non-reaktif", label: "Non-reaktif" },
+                    { value: "Reaktif", label: "Reaktif" },
+                  ]}
+                />
               </label>
 
               <label className="data-ibu-filter-field">
                 <span>Status Sifilis</span>
-                <select
+                <CustomSelect
                   value={filters.statusSifilis}
-                  onChange={(event) =>
-                    updateFilter("statusSifilis", event.target.value)
-                  }
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="Negatif">Negatif</option>
-                  <option value="Positif">Positif</option>
-                </select>
+                  onChange={(nextValue) => updateFilter("statusSifilis", nextValue)}
+                  options={[
+                    { value: "all", label: "Semua Status" },
+                    { value: "Negatif", label: "Negatif" },
+                    { value: "Positif", label: "Positif" },
+                  ]}
+                />
               </label>
             </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import CustomSelect from "../components/CustomSelect";
 import EntityPage from "../components/EntityPage";
 import "../styles/Kehamilan.css";
 
@@ -327,60 +328,38 @@ function Kehamilan() {
             <div className="trimester-filter-grid">
               <label className="trimester-filter-field">
                 <span>Lama Kehamilan</span>
-                <select
+                <CustomSelect
                   value={filters.kategori}
-                  onChange={(event) => updateFilter("kategori", event.target.value)}
-                >
-                  {KATEGORI_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(nextValue) => updateFilter("kategori", nextValue)}
+                  options={KATEGORI_OPTIONS}
+                />
               </label>
 
               <label className="trimester-filter-field">
                 <span>Status Ibu</span>
-                <select
+                <CustomSelect
                   value={filters.statusIbu}
-                  onChange={(event) => updateFilter("statusIbu", event.target.value)}
-                >
-                  {STATUS_IBU_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(nextValue) => updateFilter("statusIbu", nextValue)}
+                  options={STATUS_IBU_OPTIONS}
+                />
               </label>
 
               <label className="trimester-filter-field">
                 <span>Status HIV</span>
-                <select
+                <CustomSelect
                   value={filters.statusHiv}
-                  onChange={(event) => updateFilter("statusHiv", event.target.value)}
-                >
-                  {STATUS_HIV_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(nextValue) => updateFilter("statusHiv", nextValue)}
+                  options={STATUS_HIV_OPTIONS}
+                />
               </label>
 
               <label className="trimester-filter-field">
                 <span>Status Sifilis</span>
-                <select
+                <CustomSelect
                   value={filters.statusSifilis}
-                  onChange={(event) =>
-                    updateFilter("statusSifilis", event.target.value)
-                  }
-                >
-                  {STATUS_SIFILIS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(nextValue) => updateFilter("statusSifilis", nextValue)}
+                  options={STATUS_SIFILIS_OPTIONS}
+                />
               </label>
             </div>
 

@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fetchJson } from "../utils/api";
+import CustomSelect from "./CustomSelect";
 import "../styles/EntityPage.css";
 
 const INDONESIAN_MONTHS = [
@@ -176,6 +177,53 @@ const attachIbuName = (record, ibuOptions) => {
   };
 };
 
+const FormSkeleton = () => (
+  <div className="entity-skeleton-form" aria-hidden="true">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <div key={`form-skeleton-${index}`} className="entity-skeleton-field">
+        <span className="entity-skeleton-line entity-skeleton-label" />
+        <span className="entity-skeleton-line entity-skeleton-input" />
+      </div>
+    ))}
+    <div className="sticky-action-bar skeleton-action-bar">
+      <div className="sticky-action-copy">
+        <span className="entity-skeleton-line entity-skeleton-copy" />
+        <span className="entity-skeleton-line entity-skeleton-copy entity-skeleton-copy-short" />
+      </div>
+      <div className="sticky-action-buttons">
+        <span className="entity-skeleton-line entity-skeleton-button" />
+      </div>
+    </div>
+  </div>
+);
+
+const TableSkeleton = ({ columnsCount }) => (
+  <div className="table-wrapper entity-skeleton-table" aria-hidden="true">
+    <table className="data-table">
+      <thead>
+        <tr>
+          {Array.from({ length: columnsCount + 1 }).map((_, index) => (
+            <th key={`skeleton-head-${index}`}>
+              <span className="entity-skeleton-line entity-skeleton-header" />
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 4 }).map((_, rowIndex) => (
+          <tr key={`skeleton-row-${rowIndex}`}>
+            {Array.from({ length: columnsCount + 1 }).map((__, columnIndex) => (
+              <td key={`skeleton-cell-${rowIndex}-${columnIndex}`}>
+                <span className="entity-skeleton-line entity-skeleton-cell" />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
 function EntityPage({
   title,
   description,
@@ -201,6 +249,10 @@ function EntityPage({
   const [successMessage, setSuccessMessage] = useState("");
   const [clientErrors, setClientErrors] = useState({});
   const [activeView, setActiveView] = useState(defaultView);
+  const [saveEffectState, setSaveEffectState] = useState("idle");
+  const effectTimeoutRef = useRef(null);
+
+  useEffect(() => () => window.clearTimeout(effectTimeoutRef.current), []);
 
   const loadData = async () => {
     setLoading(true);
@@ -309,6 +361,8 @@ function EntityPage({
     setError("");
     setSuccessMessage("");
     setClientErrors({});
+    setSaveEffectState("saving");
+    window.clearTimeout(effectTimeoutRef.current);
 
     try {
       const currentEditingId = editingId;
@@ -354,6 +408,10 @@ function EntityPage({
       setSuccessMessage(
         currentEditingId ? "Data berhasil diperbarui." : "Data berhasil disimpan."
       );
+      setSaveEffectState("saved");
+      effectTimeoutRef.current = window.setTimeout(() => {
+        setSaveEffectState("idle");
+      }, 1800);
 
       if (onSuccess) {
         onSuccess(latestSavedRecord, {
@@ -363,6 +421,7 @@ function EntityPage({
 
     } catch (err) {
       setError(err.message);
+      setSaveEffectState("idle");
     } finally {
       setSubmitting(false);
     }
@@ -474,14 +533,10 @@ function EntityPage({
 
       <div className={separateViews ? "entity-grid entity-grid-single" : "entity-grid"}>
         {showFormPanel ? (
-          <div className="panel-card">
+          <div className={`panel-card floating-paper-card save-effect-card ${saveEffectState}`}>
+            <div className="save-effect-glow" aria-hidden="true" />
             <div className="panel-heading">
               <h3>{editingId ? "Edit Data" : "Form Input"}</h3>
-              {editingId && (
-                <button onClick={handleCancelEdit} className="secondary-button">
-                  Batal Edit
-                </button>
-              )}
             </div>
 
             {error && <div className="alert error">{error}</div>}
@@ -497,121 +552,127 @@ function EntityPage({
               </div>
             ) : null}
 
-            <form className="data-form" onSubmit={handleSubmit}>
-              {fields.map((field) => {
-                if (field.type === "select-ibu") {
-                  return (
-                    <label key={field.name} className="form-group">
-                      <span>{field.label}</span>
-                      <select
-                        className={clientErrors[field.name] ? "input-error" : ""}
-                        name={field.name}
-                        value={formData[field.name] || ""}
-                        onChange={handleChange}
-                        required={field.required}
-                      >
-                        <option value="">Pilih ibu</option>
-                        {ibuOptions.map((ibu) => (
-                          <option key={ibu.id} value={ibu.id}>
-                            {ibu.nama}
-                          </option>
-                        ))}
-                      </select>
-                      {clientErrors[field.name] ? (
-                        <small className="field-error">{clientErrors[field.name]}</small>
-                      ) : null}
-                    </label>
-                  );
-                }
+            {loading ? (
+              <FormSkeleton />
+            ) : (
+              <form className="data-form" onSubmit={handleSubmit}>
+                {fields.map((field) => {
+                  if (field.type === "select-ibu") {
+                    return (
+                      <label key={field.name} className="form-group">
+                        <span>{field.label}</span>
+                        <CustomSelect
+                          className={clientErrors[field.name] ? "input-error" : ""}
+                          value={formData[field.name] || ""}
+                          onChange={(nextValue) =>
+                            handleChange({ target: { name: field.name, value: nextValue } })
+                          }
+                          options={ibuOptions.map((ibu) => ({
+                            value: ibu.id,
+                            label: ibu.nama,
+                          }))}
+                          placeholder="Pilih ibu"
+                          searchPlaceholder="Cari nama ibu..."
+                          searchable
+                        />
+                        {clientErrors[field.name] ? (
+                          <small className="field-error">{clientErrors[field.name]}</small>
+                        ) : null}
+                      </label>
+                    );
+                  }
 
-                if (field.type === "textarea") {
+                  if (field.type === "textarea") {
+                    return (
+                      <label key={field.name} className="form-group">
+                        <span>{field.label}</span>
+                        <textarea
+                          className={clientErrors[field.name] ? "input-error" : ""}
+                          name={field.name}
+                          value={formData[field.name] || ""}
+                          onChange={handleChange}
+                          required={field.required}
+                          placeholder={field.placeholder}
+                        />
+                        {clientErrors[field.name] ? (
+                          <small className="field-error">{clientErrors[field.name]}</small>
+                        ) : null}
+                      </label>
+                    );
+                  }
+
+                  if (field.type === "select" && field.options) {
+                    return (
+                      <label key={field.name} className="form-group">
+                        <span>{field.label}</span>
+                        <CustomSelect
+                          className={clientErrors[field.name] ? "input-error" : ""}
+                          value={formData[field.name] || ""}
+                          onChange={(nextValue) =>
+                            handleChange({ target: { name: field.name, value: nextValue } })
+                          }
+                          options={field.options}
+                          placeholder="Pilih"
+                        />
+                        {clientErrors[field.name] ? (
+                          <small className="field-error">{clientErrors[field.name]}</small>
+                        ) : null}
+                      </label>
+                    );
+                  }
+
                   return (
                     <label key={field.name} className="form-group">
                       <span>{field.label}</span>
-                      <textarea
+                      <input
+                        type={field.type || "text"}
                         className={clientErrors[field.name] ? "input-error" : ""}
                         name={field.name}
                         value={formData[field.name] || ""}
                         onChange={handleChange}
                         required={field.required}
                         placeholder={field.placeholder}
+                        inputMode={field.inputMode}
+                        maxLength={field.maxLength}
                       />
                       {clientErrors[field.name] ? (
                         <small className="field-error">{clientErrors[field.name]}</small>
                       ) : null}
                     </label>
                   );
-                }
+                })}
 
-                if (field.type === "select" && field.options) {
-                  return (
-                    <label key={field.name} className="form-group">
-                      <span>{field.label}</span>
-                      <select
-                        className={clientErrors[field.name] ? "input-error" : ""}
-                        name={field.name}
-                        value={formData[field.name] || ""}
-                        onChange={handleChange}
-                        required={field.required}
-                      >
-                        <option value="">Pilih</option>
-                        {field.options.map((option) => {
-                          if (typeof option === "string") {
-                            return (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            );
-                          }
-
-                          return (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      {clientErrors[field.name] ? (
-                        <small className="field-error">{clientErrors[field.name]}</small>
-                      ) : null}
-                    </label>
-                  );
-                }
-
-                return (
-                  <label key={field.name} className="form-group">
-                    <span>{field.label}</span>
-                    <input
-                      type={field.type || "text"}
-                      className={clientErrors[field.name] ? "input-error" : ""}
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleChange}
-                      required={field.required}
-                      placeholder={field.placeholder}
-                      inputMode={field.inputMode}
-                      maxLength={field.maxLength}
-                    />
-                    {clientErrors[field.name] ? (
-                      <small className="field-error">{clientErrors[field.name]}</small>
+                <div className="sticky-action-bar">
+                  <div className="sticky-action-copy">
+                    <strong>{editingId ? "Mode edit aktif" : "Siap menyimpan data"}</strong>
+                    <span>
+                      {editingId
+                        ? "Periksa kembali perubahan sebelum memperbarui data."
+                        : "Pastikan semua field wajib sudah terisi dengan benar."}
+                    </span>
+                  </div>
+                  <div className="sticky-action-buttons">
+                    {editingId ? (
+                      <button type="button" onClick={handleCancelEdit} className="secondary-button">
+                        Batal Edit
+                      </button>
                     ) : null}
-                  </label>
-                );
-              })}
-
-              <button type="submit" disabled={submitting} className="primary-button">
-                {submitting
-                  ? "Menyimpan..."
-                  : editingId
-                  ? "Update Data"
-                  : "Simpan Data"}
-              </button>
-            </form>
+                    <button type="submit" disabled={submitting} className="primary-button sticky-submit-button">
+                      {submitting
+                        ? "Menyimpan..."
+                        : editingId
+                        ? "Update Data"
+                        : "Simpan Data"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
           </div>
         ) : null}
 
         {showTablePanel ? (
-          <div className="panel-card">
+          <div className="panel-card floating-paper-card">
             <div className="panel-heading">
               <h3>Daftar Data</h3>
               {separateViews ? (
@@ -643,7 +704,7 @@ function EntityPage({
             ) : null}
 
             {loading ? (
-              <p>Loading...</p>
+              <TableSkeleton columnsCount={columns.length} />
             ) : displayedRecords.length === 0 ? (
               <p>Belum ada data yang dapat ditampilkan.</p>
             ) : (

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { PDFViewer } from "@react-pdf/renderer";
+import CustomSelect from "../components/CustomSelect";
 import KartuIbuHamilPDF from "../components/KartuIbuHamilPDF";
 import "../styles/Output.css";
 import { fetchJson } from "../utils/api";
@@ -199,16 +200,17 @@ function Output() {
           <div className="output-toolbar">
             <label className="output-field">
               <span>Pilih Nama Ibu</span>
-              <select
+              <CustomSelect
                 value={selectedIbuId}
-                onChange={(event) => setSelectedIbuId(event.target.value)}
-              >
-                {ibuOptions.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama}
-                  </option>
-                ))}
-              </select>
+                onChange={(nextValue) => setSelectedIbuId(nextValue)}
+                options={ibuOptions.map((item) => ({
+                  value: item.id,
+                  label: item.nama,
+                }))}
+                placeholder="Pilih nama ibu"
+                searchPlaceholder="Cari nama ibu..."
+                searchable
+              />
             </label>
           </div>
 
@@ -260,16 +262,17 @@ function Output() {
         <div className="output-toolbar">
           <label className="output-field">
             <span>Pilih Nama Ibu</span>
-            <select
+            <CustomSelect
               value={selectedIbuId}
-              onChange={(event) => setSelectedIbuId(event.target.value)}
-            >
-              {ibuOptions.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nama}
-                </option>
-                ))}
-            </select>
+              onChange={(nextValue) => setSelectedIbuId(nextValue)}
+              options={ibuOptions.map((item) => ({
+                value: item.id,
+                label: item.nama,
+              }))}
+              placeholder="Pilih nama ibu"
+              searchPlaceholder="Cari nama ibu..."
+              searchable
+            />
           </label>
         </div>
 

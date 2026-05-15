@@ -89,7 +89,7 @@
   letter-spacing: 0.06em;
 }
 
-.output-field select {
+.output-field .custom-select-trigger {
   width: 100%;
   min-width: 0;
   padding: 0.9rem 1rem;

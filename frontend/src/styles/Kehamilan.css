@@ -37,7 +37,7 @@
   font-size: 0.85rem;
 }
 
-.trimester-filter-field select {
+.trimester-filter-field .custom-select-trigger {
   width: 100%;
   padding: 0.75rem 0.85rem;
   border: 1px solid rgba(205, 137, 169, 0.35);

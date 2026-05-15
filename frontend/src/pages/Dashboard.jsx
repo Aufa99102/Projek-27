@@ -59,6 +59,10 @@ const renderBadge = (label, tone) => (
   <span className={`dashboard-badge ${tone}`}>{label}</span>
 );
 
+const DashboardSkeletonLine = ({ className = "" }) => (
+  <span className={`skeleton-line ${className}`.trim()} aria-hidden="true" />
+);
+
 function Dashboard() {
   const [summary, setSummary] = useState({
     total_ibu: 0,
@@ -150,25 +154,45 @@ function Dashboard() {
       {error ? <div className="alert error">{error}</div> : null}
 
       <div className="stats-grid stats-grid-primary">
-        {primaryStats.map((stat) => (
-          <article key={stat.label} className={`stat-card ${stat.accent}`}>
+        {primaryStats.map((stat, index) => (
+          <article
+            key={stat.label}
+            className={`stat-card ${stat.accent} floating-paper-card`}
+            style={{ "--card-delay": `${index * 140}ms` }}
+          >
             <span>{stat.label}</span>
-            <strong>{loading ? "..." : stat.value}</strong>
+            {loading ? (
+              <div className="skeleton-stack">
+                <DashboardSkeletonLine className="skeleton-line-value" />
+              </div>
+            ) : (
+              <strong>{stat.value}</strong>
+            )}
           </article>
         ))}
       </div>
 
       <div className="stats-grid">
-        {secondaryStats.map((stat) => (
-          <article key={stat.label} className="stat-card soft">
+        {secondaryStats.map((stat, index) => (
+          <article
+            key={stat.label}
+            className="stat-card soft floating-paper-card"
+            style={{ "--card-delay": `${index * 160}ms` }}
+          >
             <span>{stat.label}</span>
-            <strong>{loading ? "..." : stat.value}</strong>
+            {loading ? (
+              <div className="skeleton-stack">
+                <DashboardSkeletonLine className="skeleton-line-value" />
+              </div>
+            ) : (
+              <strong>{stat.value}</strong>
+            )}
           </article>
         ))}
       </div>
 
       <div className="dashboard-grid">
-        <section className="activity-card">
+        <section className="activity-card floating-paper-card" style={{ "--card-delay": "120ms" }}>
           <div className="section-heading">
             <div>
               <p className="section-overline">Status Skrining</p>
@@ -183,7 +207,11 @@ function Dashboard() {
                 {STATUS_HIV_ITEMS.map((item) => (
                   <div key={item.key} className="summary-row">
                     {renderBadge(item.label, item.tone)}
-                    <strong>{loading ? "..." : hivMap[item.key] ?? 0}</strong>
+                    {loading ? (
+                      <DashboardSkeletonLine className="skeleton-line-inline" />
+                    ) : (
+                      <strong>{hivMap[item.key] ?? 0}</strong>
+                    )}
                   </div>
                 ))}
               </div>
@@ -195,7 +223,11 @@ function Dashboard() {
                 {STATUS_SIFILIS_ITEMS.map((item) => (
                   <div key={item.key} className="summary-row">
                     {renderBadge(item.label, item.tone)}
-                    <strong>{loading ? "..." : sifilisMap[item.key] ?? 0}</strong>
+                    {loading ? (
+                      <DashboardSkeletonLine className="skeleton-line-inline" />
+                    ) : (
+                      <strong>{sifilisMap[item.key] ?? 0}</strong>
+                    )}
                   </div>
                 ))}
               </div>
@@ -203,7 +235,7 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="activity-card">
+        <section className="activity-card floating-paper-card" style={{ "--card-delay": "220ms" }}>
           <div className="section-heading">
             <div>
               <p className="section-overline">Kategori Kehamilan</p>
@@ -212,18 +244,31 @@ function Dashboard() {
           </div>
 
           <div className="category-grid">
-            {KATEGORI_ITEMS.map((item) => (
-              <article key={item.key} className="category-card">
+            {KATEGORI_ITEMS.map((item, index) => (
+              <article
+                key={item.key}
+                className="category-card floating-paper-card"
+                style={{ "--card-delay": `${index * 140}ms` }}
+              >
                 {renderBadge(item.label, item.tone)}
-                <strong>{loading ? "..." : kategoriMap[item.key] ?? 0}</strong>
-                <span>Data ibu pada kategori ini</span>
+                {loading ? (
+                  <>
+                    <DashboardSkeletonLine className="skeleton-line-value skeleton-line-value-small" />
+                    <DashboardSkeletonLine className="skeleton-line-text" />
+                  </>
+                ) : (
+                  <>
+                    <strong>{kategoriMap[item.key] ?? 0}</strong>
+                    <span>Data ibu pada kategori ini</span>
+                  </>
+                )}
               </article>
             ))}
           </div>
         </section>
       </div>
 
-      <section className="activity-card">
+      <section className="activity-card floating-paper-card" style={{ "--card-delay": "320ms" }}>
         <div className="section-heading">
           <div>
             <p className="section-overline">Rekap Bulanan</p>
@@ -232,13 +277,27 @@ function Dashboard() {
         </div>
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="activity-list">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="activity-item activity-item-skeleton">
+                <DashboardSkeletonLine className="skeleton-line-title" />
+                <div className="activity-metrics">
+                  <DashboardSkeletonLine className="skeleton-line-text" />
+                  <DashboardSkeletonLine className="skeleton-line-text" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : summary.rekap_ibu_bulanan.length === 0 ? (
           <p>Belum ada rekap bulanan yang dapat ditampilkan.</p>
         ) : (
           <div className="activity-list">
-            {summary.rekap_ibu_bulanan.map((item) => (
-              <div key={item.bulan} className="activity-item">
+            {summary.rekap_ibu_bulanan.map((item, index) => (
+              <div
+                key={item.bulan}
+                className="activity-item floating-paper-card"
+                style={{ "--card-delay": `${index * 80}ms` }}
+              >
                 <strong>{formatMonthLabel(item.bulan)}</strong>
                 <div className="activity-metrics">
                   <span>Total ibu hamil: {item.total_ibu}</span>
