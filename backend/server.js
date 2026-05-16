@@ -15,6 +15,42 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const formatServerError = (error) => {
+  if (error?.code === "ECONNREFUSED") {
+    return {
+      statusCode: 503,
+      message: "Koneksi database gagal. Pastikan service database sedang aktif.",
+    };
+  }
+
+  if (error?.code === "ER_BAD_DB_ERROR") {
+    return {
+      statusCode: 500,
+      message: "Database tujuan belum tersedia atau nama database tidak sesuai.",
+    };
+  }
+
+  if (error?.code === "ER_ACCESS_DENIED_ERROR") {
+    return {
+      statusCode: 500,
+      message: "Akses ke database ditolak. Periksa username dan password database.",
+    };
+  }
+
+  return {
+    statusCode: error?.statusCode || error?.status || 500,
+    message: error?.message || "Terjadi kesalahan pada server.",
+  };
+};
+
+const formatLogError = (error) => {
+  if (!error) {
+    return "Unknown error";
+  }
+
+  return [error.code, error.message].filter(Boolean).join(" - ") || String(error);
+};
+
 app.use(express.json());
 
 // CORS sederhana (boleh nanti diganti cors package)
@@ -34,7 +70,7 @@ app.use((req, res, next) => {
 // ROOT
 app.get("/", (req, res) => {
   res.json({
-    message: "KI Care API aktif",
+    message: "KI-DIGITAL API aktif",
   });
 });
 
@@ -76,8 +112,24 @@ app.use("/api/dashboard", dashboardRoutes);
 // 404 HANDLER
 app.use((req, res) => {
   res.status(404).json({
+    status: "error",
     message: "Route tidak ditemukan",
     path: req.originalUrl,
+  });
+});
+
+// ERROR HANDLER
+app.use((error, req, res, next) => {
+  const { statusCode, message } = formatServerError(error);
+
+  if (statusCode >= 500) {
+    console.error("UNHANDLED SERVER ERROR:", error);
+  }
+
+  res.status(statusCode).json({
+    status: "error",
+    message,
+    code: error?.code || null,
   });
 });
 
@@ -88,7 +140,7 @@ const startServer = async () => {
     await testConnection();
     console.log("Database connected");
   } catch (err) {
-    console.error("DB error:", err.message);
+    console.error("DB error:", formatLogError(err));
   }
 
   app.listen(PORT, () => {
