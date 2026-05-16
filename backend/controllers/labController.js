@@ -5,6 +5,8 @@ const GOLDAR_OPTIONS = ["A", "B", "AB", "O"];
 const ALBUMIN_OPTIONS = ["Negatif", "Positif"];
 const HBSAG_OPTIONS = ["Reaktif", "Non-Reaktif"];
 const PROTEIN_URINA_OPTIONS = ["+1", "+2", "+3"];
+const HIV_OPTIONS = ["Positif", "Negatif"];
+const SIFILIS_OPTIONS = ["Positif", "Negatif"];
 
 const validateEnum = (value, options, label) => {
   if (isBlank(value)) return null;
@@ -31,26 +33,26 @@ const validateLabPayload = async (payload) => {
   if (
     isBlank(ibu_id) ||
     isBlank(golongan_darah) ||
-    isBlank(gds) ||
-    isBlank(hiv) ||
-    isBlank(sifilis) ||
-    isBlank(hb) ||
-    isBlank(penyakit) ||
-    isBlank(protein_urina) ||
-    isBlank(albumin) ||
-    isBlank(hbsag)
+    isBlank(hb)
   ) {
-    return "Semua Field wajib terisi";
+    return "Field ibu, golongan darah, dan HB wajib terisi";
   }
 
   const relationError = await validateIbuRelation(ibu_id);
+
   if (relationError) return relationError;
 
   return (
     validateEnum(golongan_darah, GOLDAR_OPTIONS, "Golongan darah") ||
     validateEnum(albumin, ALBUMIN_OPTIONS, "Albumin") ||
     validateEnum(hbsag, HBSAG_OPTIONS, "HBSAG") ||
-    validateEnum(protein_urina, PROTEIN_URINA_OPTIONS, "Protein Urina")
+    validateEnum(
+      protein_urina,
+      PROTEIN_URINA_OPTIONS,
+      "Protein Urina"
+    ) ||
+    validateEnum(hiv, HIV_OPTIONS, "HIV") ||
+    validateEnum(sifilis, SIFILIS_OPTIONS, "Sifilis")
   );
 };
 
@@ -64,6 +66,7 @@ const GetDataLab = async (req, res, next) => {
       FROM lab l
       LEFT JOIN ibu i ON i.id = l.ibu_id
     `;
+
     const [rows] = await db.execute(query);
 
     return res.status(200).json({
@@ -72,6 +75,41 @@ const GetDataLab = async (req, res, next) => {
       data: rows,
     });
   } catch (error) {
+    console.error("GET LAB ERROR:", error);
+    next(error);
+  }
+};
+
+// GET BY ID
+const GetDataLabById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT
+        l.*,
+        i.nama AS ibu_nama
+      FROM lab l
+      LEFT JOIN ibu i ON i.id = l.ibu_id
+      WHERE l.id = ?
+    `;
+
+    const [rows] = await db.execute(query, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Data lab tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Berhasil mengambil detail data lab",
+      data: rows[0],
+    });
+  } catch (error) {
+    console.error("GET LAB BY ID ERROR:", error);
     next(error);
   }
 };
@@ -103,21 +141,32 @@ const CreateDataLab = async (req, res, next) => {
 
     const query = `
       INSERT INTO lab
-      (ibu_id, golongan_darah, gds, hiv, sifilis, hb, penyakit, protein_urina, albumin, hbsag)
+      (
+        ibu_id,
+        golongan_darah,
+        gds,
+        hiv,
+        sifilis,
+        hb,
+        penyakit,
+        protein_urina,
+        albumin,
+        hbsag
+      )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     await db.execute(query, [
       ibu_id,
       golongan_darah,
-      gds,
-      hiv,
-      sifilis,
+      gds || null,
+      hiv || null,
+      sifilis || null,
       hb,
-      penyakit,
-      protein_urina,
-      albumin,
-      hbsag,
+      penyakit || null,
+      protein_urina || null,
+      albumin || null,
+      hbsag || null,
     ]);
 
     return res.status(201).json({
@@ -125,6 +174,7 @@ const CreateDataLab = async (req, res, next) => {
       message: "Berhasil menambahkan data lab",
     });
   } catch (error) {
+    console.error("CREATE LAB ERROR:", error);
     next(error);
   }
 };
@@ -133,6 +183,7 @@ const CreateDataLab = async (req, res, next) => {
 const UpdateDataLab = async (req, res, next) => {
   try {
     const { id } = req.params;
+
     const validationError = await validateLabPayload(req.body);
 
     if (validationError) {
@@ -157,21 +208,31 @@ const UpdateDataLab = async (req, res, next) => {
 
     const query = `
       UPDATE lab
-      SET ibu_id=?, golongan_darah=?, gds=?, hiv=?, sifilis=?, hb=?, penyakit=?, protein_urina=?, albumin=?, hbsag=?
+      SET
+        ibu_id=?,
+        golongan_darah=?,
+        gds=?,
+        hiv=?,
+        sifilis=?,
+        hb=?,
+        penyakit=?,
+        protein_urina=?,
+        albumin=?,
+        hbsag=?
       WHERE id=?
     `;
 
     const [result] = await db.execute(query, [
       ibu_id,
       golongan_darah,
-      gds,
-      hiv,
-      sifilis,
+      gds || null,
+      hiv || null,
+      sifilis || null,
       hb,
-      penyakit,
-      protein_urina,
-      albumin,
-      hbsag,
+      penyakit || null,
+      protein_urina || null,
+      albumin || null,
+      hbsag || null,
       id,
     ]);
 
@@ -187,6 +248,7 @@ const UpdateDataLab = async (req, res, next) => {
       message: "Berhasil update data lab",
     });
   } catch (error) {
+    console.error("UPDATE LAB ERROR:", error);
     next(error);
   }
 };
@@ -197,6 +259,7 @@ const DeleteDataLab = async (req, res, next) => {
     const { id } = req.params;
 
     const query = "DELETE FROM lab WHERE id = ?";
+
     const [result] = await db.execute(query, [id]);
 
     if (result.affectedRows === 0) {
@@ -211,12 +274,14 @@ const DeleteDataLab = async (req, res, next) => {
       message: "Berhasil delete data lab",
     });
   } catch (error) {
+    console.error("DELETE LAB ERROR:", error);
     next(error);
   }
 };
 
 module.exports = {
   GetDataLab,
+  GetDataLabById,
   CreateDataLab,
   UpdateDataLab,
   DeleteDataLab,

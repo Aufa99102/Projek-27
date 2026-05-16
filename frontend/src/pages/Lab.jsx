@@ -3,7 +3,13 @@ import EntityPage from "../components/EntityPage";
 import "../styles/Lab.css";
 
 const fields = [
-  { name: "ibu_id", label: "Pilih Ibu", type: "select-ibu", required: true },
+  {
+    name: "ibu_id",
+    label: "Pilih Ibu",
+    type: "select-ibu",
+    required: true,
+  },
+
   {
     name: "golongan_darah",
     label: "Golongan Darah",
@@ -11,17 +17,26 @@ const fields = [
     required: true,
     options: ["A", "B", "AB", "O"],
   },
-  { name: "gds", label: "GDS", required: true, numericOnly: true, allowDecimal: true },
+
+  {
+    name: "gds",
+    label: "GDS",
+    required: true,
+    numericOnly: true,
+    allowDecimal: true,
+  },
+
   {
     name: "hiv",
     label: "HIV",
     type: "select",
     required: true,
     options: [
-      { value: "Non-Reaktif", label: "Non-Reaktif" },
-      { value: "Reaktif", label: "Reaktif" },
+      { value: "Negatif", label: "Negatif" },
+      { value: "Positif", label: "Positif" },
     ],
   },
+
   {
     name: "sifilis",
     label: "Sifilis",
@@ -32,8 +47,21 @@ const fields = [
       { value: "Positif", label: "Positif" },
     ],
   },
-  { name: "hb", label: "HB", required: true, numericOnly: true, allowDecimal: true },
-  { name: "penyakit", label: "Penyakit", required: true },
+
+  {
+    name: "hb",
+    label: "HB",
+    required: true,
+    numericOnly: true,
+    allowDecimal: true,
+  },
+
+  {
+    name: "penyakit",
+    label: "Penyakit",
+    required: true,
+  },
+
   {
     name: "protein_urina",
     label: "Protein Urina",
@@ -41,6 +69,7 @@ const fields = [
     required: true,
     options: ["+1", "+2", "+3"],
   },
+
   {
     name: "albumin",
     label: "Albumin",
@@ -48,6 +77,7 @@ const fields = [
     required: true,
     options: ["Negatif", "Positif"],
   },
+
   {
     name: "hbsag",
     label: "HBSAG",

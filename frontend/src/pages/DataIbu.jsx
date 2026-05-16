@@ -257,7 +257,7 @@ function DataIbu() {
                   options={[
                     { value: "all", label: "Semua Status" },
                     { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-                    { value: "Lama Kunjungan", label: "Lama Kunjungan" },
+                    { value: "Kunjungan Lama", label: "Kunjungan Lama" },
                   ]}
                 />
               </label>
