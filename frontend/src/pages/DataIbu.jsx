@@ -42,10 +42,18 @@ const renderBadge = (label, tone) => (
 const JENIS_KUNJUNGAN_OPTIONS = ["K1", "K6", "K8"];
 
 const getStatusIbuLabel = (value) => {
-  if (value === "baru" || value === "Kunjungan Baru") return "Kunjungan Baru";
-  if (value === "lama" || value === "Kunjungan Lama" || value === "Lama Kunjungan") {
-    return "Lama Kunjungan";
+  if (value === "baru" || value === "Kunjungan Baru") {
+    return "Kunjungan Baru";
   }
+
+  if (
+    value === "lama" ||
+    value === "Lama Kunjungan" ||
+    value === "Kunjungan Lama"
+  ) {
+    return "Kunjungan Lama";
+  }
+
   return value || "-";
 };
 
@@ -111,13 +119,7 @@ const fields = [
     required: true,
     placeholder: "Masukkan nomor rekam medis",
   },
-  {
-    name: "golongan_darah",
-    label: "Golongan Darah",
-    type: "select",
-    required: true,
-    options: ["A", "B", "AB", "O"],
-  },
+
   { name: "lila", label: "LILA", type: "number", required: true, allowDecimal: true },
   {
     name: "status_tt",
@@ -140,7 +142,7 @@ const fields = [
     required: true,
     options: [
       { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-      { value: "Lama Kunjungan", label: "Lama Kunjungan" },
+      { value: "Kunjungan Lama", label: "Kunjungan Lama" },
     ],
   },
 ];

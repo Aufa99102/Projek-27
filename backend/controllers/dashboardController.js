@@ -58,9 +58,9 @@ const getDashboard = async (req, res, next) => {
 
     const [kunjunganBulanIni] = await db.execute(`
       SELECT COUNT(*) AS total
-      FROM pemeriksaan_anc
-      WHERE MONTH(tanggal_kunjungan) = MONTH(CURRENT_DATE())
-      AND YEAR(tanggal_kunjungan) = YEAR(CURRENT_DATE())
+    FROM ibu
+    WHERE created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+    AND created_at < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
     `);
 
     const [ibuBaru] = await db.execute(`

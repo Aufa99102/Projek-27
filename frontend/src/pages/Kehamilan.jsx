@@ -26,8 +26,20 @@ const fields = [
     type: "textarea",
     required: true,
   },
-  { name: "bb_sebelum_hamil", label: "BB Sebelum Hamil", required: true, numericOnly: true, allowDecimal: true },
-  { name: "imt", label: "IMT", required: true, numericOnly: true, allowDecimal: true },
+  {
+    name: "bb_sebelum_hamil",
+    label: "BB Sebelum Hamil",
+    required: true,
+    numericOnly: true,
+    allowDecimal: true,
+  },
+  {
+    name: "imt",
+    label: "IMT",
+    required: true,
+    numericOnly: true,
+    allowDecimal: true,
+  },
 ];
 
 const KATEGORI_OPTIONS = [
@@ -40,7 +52,7 @@ const KATEGORI_OPTIONS = [
 const STATUS_IBU_OPTIONS = [
   { value: "all", label: "Semua Status" },
   { value: "Kunjungan Baru", label: "Kunjungan Baru" },
-  { value: "Lama Kunjungan", label: "Lama Kunjungan" },
+  { value: "Kunjungan Lama", label: "Kunjungan Lama" },
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -48,25 +60,39 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const getStartOfLocalDay = (date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
+/* =========================
+   PERBAIKAN ADA DI SINI
+========================= */
 const parseDate = (value) => {
   if (!value) {
     return null;
   }
 
+  // Handle format MySQL dan ISO Date
   if (typeof value === "string") {
-    const trimmedValue = value.trim();
-    const dayFirstMatch = trimmedValue.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    const cleanValue = value.split("T")[0];
 
-    if (dayFirstMatch) {
-      const [, day, month, year] = dayFirstMatch;
-      const parsedDayFirstDate = new Date(Number(year), Number(month) - 1, Number(day));
-      return Number.isNaN(parsedDayFirstDate.getTime()) ? null : parsedDayFirstDate;
+    // Hindari tanggal kosong MySQL
+    if (cleanValue === "0000-00-00") {
+      return null;
+    }
+
+    const parsed = new Date(cleanValue);
+
+    if (!Number.isNaN(parsed.getTime())) {
+      return getStartOfLocalDay(parsed);
     }
   }
 
   const parsedDate = new Date(value);
-  return Number.isNaN(parsedDate.getTime()) ? null : getStartOfLocalDay(parsedDate);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return getStartOfLocalDay(parsedDate);
 };
+/* ========================= */
 
 const hitungUsiaKehamilan = (hpht) => {
   const now = getStartOfLocalDay(new Date());
@@ -80,8 +106,13 @@ const hitungUsiaKehamilan = (hpht) => {
     };
   }
 
-  const usiaKehamilanMinggu = Math.floor((now - hphtDate) / DAY_IN_MS / 7);
-  const usiaKehamilanHari = Math.floor((now - hphtDate) / DAY_IN_MS);
+  const usiaKehamilanMinggu = Math.floor(
+    (now - hphtDate) / DAY_IN_MS / 7
+  );
+
+  const usiaKehamilanHari = Math.floor(
+    (now - hphtDate) / DAY_IN_MS
+  );
 
   if (usiaKehamilanHari < 0 || usiaKehamilanMinggu < 0) {
     return {
@@ -92,7 +123,9 @@ const hitungUsiaKehamilan = (hpht) => {
     };
   }
 
-  const usiaKehamilanBulan = Math.floor(usiaKehamilanHari / 30);
+  const usiaKehamilanBulan = Math.floor(
+    usiaKehamilanHari / 30
+  );
 
   return {
     hari: usiaKehamilanHari,
@@ -151,16 +184,25 @@ const tentukanTrimester = (usiaKehamilanMinggu) => {
 };
 
 const renderBadge = (label, tone) => (
-  <span className={`status-badge ${tone}`}>{label}</span>
+  <span className={`status-badge ${tone}`}>
+    {label}
+  </span>
 );
 
 const getStatusIbuLabel = (value) => {
-  if (value === "baru") {
+  if (
+    value === "baru" ||
+    value === "Kunjungan Baru"
+  ) {
     return "Kunjungan Baru";
   }
 
-  if (value === "lama" || value === "Kunjungan Lama") {
-    return "Lama Kunjungan";
+  if (
+    value === "lama" ||
+    value === "Kunjungan Lama" ||
+    value === "Lama Kunjungan"
+  ) {
+    return "Kunjungan Lama";
   }
 
   return value || "Belum diketahui";
@@ -208,7 +250,8 @@ function Kehamilan() {
       render: (record) =>
         renderBadge(
           getStatusIbuLabel(record.status_ibu),
-          getStatusIbuLabel(record.status_ibu) === "Kunjungan Baru"
+          getStatusIbuLabel(record.status_ibu) ===
+            "Kunjungan Baru"
             ? "info"
             : "neutral"
         ),
@@ -246,15 +289,28 @@ function Kehamilan() {
         columns={columns}
         transformRecord={(record, { ibuOptions }) => {
           const ibu = ibuOptions.find(
-            (item) => String(item.id) === String(record.ibu_id)
+            (item) =>
+              String(item.id) === String(record.ibu_id)
           );
-          const usiaKehamilan = hitungUsiaKehamilan(record.hpht);
-          const kategoriKehamilan = tentukanKategoriKehamilan(usiaKehamilan.bulan);
-          const trimesterInfo = tentukanTrimester(usiaKehamilan.minggu);
+
+          const usiaKehamilan = hitungUsiaKehamilan(
+            record.hpht
+          );
+
+          const kategoriKehamilan =
+            tentukanKategoriKehamilan(
+              usiaKehamilan.bulan
+            );
+
+          const trimesterInfo = tentukanTrimester(
+            usiaKehamilan.minggu
+          );
 
           return {
             ...record,
-            ibu_nama: ibu ? ibu.nama : `Ibu ID ${record.ibu_id}`,
+            ibu_nama: ibu
+              ? ibu.nama
+              : `Ibu ID ${record.ibu_id}`,
             status_ibu: ibu?.status_ibu || "",
             ...usiaKehamilan,
             ...kategoriKehamilan,
@@ -264,55 +320,85 @@ function Kehamilan() {
         filterRecords={(records) =>
           records.filter((record) =>
             (filters.kategori === "all" ||
-              record.kategori_kehamilan === filters.kategori) &&
+              record.kategori_kehamilan ===
+                filters.kategori) &&
             (filters.statusIbu === "all" ||
-              getStatusIbuLabel(record.status_ibu) === filters.statusIbu)
+              getStatusIbuLabel(record.status_ibu) ===
+                filters.statusIbu)
           )
         }
-        renderTableControls={({ records, displayedRecords }) => (
+        renderTableControls={({
+          records,
+          displayedRecords,
+        }) => (
           <div className="trimester-filter-card">
             <div className="trimester-filter-summary">
-              <p className="filter-label">Multi-filter data kehamilan</p>
+              <p className="filter-label">
+                Multi-filter data kehamilan
+              </p>
+
               <strong>
-                {displayedRecords.length} dari {records.length} data tampil
+                {displayedRecords.length} dari{" "}
+                {records.length} data tampil
               </strong>
             </div>
+
             <div className="trimester-filter-grid">
               <label className="trimester-filter-field">
                 <span>Lama Kehamilan</span>
+
                 <CustomSelect
                   value={filters.kategori}
-                  onChange={(nextValue) => updateFilter("kategori", nextValue)}
+                  onChange={(nextValue) =>
+                    updateFilter(
+                      "kategori",
+                      nextValue
+                    )
+                  }
                   options={KATEGORI_OPTIONS}
                 />
               </label>
 
               <label className="trimester-filter-field">
                 <span>Status Ibu</span>
+
                 <CustomSelect
                   value={filters.statusIbu}
-                  onChange={(nextValue) => updateFilter("statusIbu", nextValue)}
+                  onChange={(nextValue) =>
+                    updateFilter(
+                      "statusIbu",
+                      nextValue
+                    )
+                  }
                   options={STATUS_IBU_OPTIONS}
                 />
               </label>
-
             </div>
 
             <div className="trimester-filter-group">
-              {KATEGORI_OPTIONS.slice(1).map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={
-                    filters.kategori === option.value
-                      ? "trimester-filter-button active"
-                      : "trimester-filter-button"
-                  }
-                  onClick={() => updateFilter("kategori", option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
+              {KATEGORI_OPTIONS.slice(1).map(
+                (option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={
+                      filters.kategori ===
+                      option.value
+                        ? "trimester-filter-button active"
+                        : "trimester-filter-button"
+                    }
+                    onClick={() =>
+                      updateFilter(
+                        "kategori",
+                        option.value
+                      )
+                    }
+                  >
+                    {option.label}
+                  </button>
+                )
+              )}
+
               <button
                 type="button"
                 className="trimester-filter-button reset"

@@ -5,16 +5,22 @@ const GOLDAR_OPTIONS = ["A", "B", "AB", "O"];
 const ALBUMIN_OPTIONS = ["Negatif", "Positif"];
 const HBSAG_OPTIONS = ["Reaktif", "Non-Reaktif"];
 const PROTEIN_URINA_OPTIONS = ["+1", "+2", "+3"];
-const HIV_OPTIONS = ["Positif", "Negatif"];
+const HIV_OPTIONS = ["Reaktif", "Non-Reaktif"];
 const SIFILIS_OPTIONS = ["Positif", "Negatif"];
 
+// FIX: tambah .trim() agar spasi tidak menyebabkan validasi gagal
 const validateEnum = (value, options, label) => {
   if (isBlank(value)) return null;
 
-  return options.includes(String(value))
+  const normalized = String(value).trim();
+
+  return options.includes(normalized)
     ? null
     : `${label} harus salah satu dari: ${options.join(", ")}`;
 };
+
+// Helper: normalisasi string field (trim whitespace)
+const norm = (value) => (isBlank(value) ? null : String(value).trim());
 
 const validateLabPayload = async (payload) => {
   const {
@@ -30,27 +36,18 @@ const validateLabPayload = async (payload) => {
     hbsag,
   } = payload;
 
-  if (
-    isBlank(ibu_id) ||
-    isBlank(golongan_darah) ||
-    isBlank(hb)
-  ) {
+  if (isBlank(ibu_id) || isBlank(golongan_darah) || isBlank(hb)) {
     return "Field ibu, golongan darah, dan HB wajib terisi";
   }
 
   const relationError = await validateIbuRelation(ibu_id);
-
   if (relationError) return relationError;
 
   return (
     validateEnum(golongan_darah, GOLDAR_OPTIONS, "Golongan darah") ||
     validateEnum(albumin, ALBUMIN_OPTIONS, "Albumin") ||
     validateEnum(hbsag, HBSAG_OPTIONS, "HBSAG") ||
-    validateEnum(
-      protein_urina,
-      PROTEIN_URINA_OPTIONS,
-      "Protein Urina"
-    ) ||
+    validateEnum(protein_urina, PROTEIN_URINA_OPTIONS, "Protein Urina") ||
     validateEnum(hiv, HIV_OPTIONS, "HIV") ||
     validateEnum(sifilis, SIFILIS_OPTIONS, "Sifilis")
   );
@@ -156,17 +153,18 @@ const CreateDataLab = async (req, res, next) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
+    // FIX: gunakan norm() agar value yang disimpan sudah bersih dari whitespace
     await db.execute(query, [
       ibu_id,
-      golongan_darah,
-      gds || null,
-      hiv || null,
-      sifilis || null,
+      norm(golongan_darah),
+      norm(gds),
+      norm(hiv),
+      norm(sifilis),
       hb,
-      penyakit || null,
-      protein_urina || null,
-      albumin || null,
-      hbsag || null,
+      norm(penyakit),
+      norm(protein_urina),
+      norm(albumin),
+      norm(hbsag),
     ]);
 
     return res.status(201).json({
@@ -222,17 +220,18 @@ const UpdateDataLab = async (req, res, next) => {
       WHERE id=?
     `;
 
+    // FIX: gunakan norm() agar value yang disimpan sudah bersih dari whitespace
     const [result] = await db.execute(query, [
       ibu_id,
-      golongan_darah,
-      gds || null,
-      hiv || null,
-      sifilis || null,
+      norm(golongan_darah),
+      norm(gds),
+      norm(hiv),
+      norm(sifilis),
       hb,
-      penyakit || null,
-      protein_urina || null,
-      albumin || null,
-      hbsag || null,
+      norm(penyakit),
+      norm(protein_urina),
+      norm(albumin),
+      norm(hbsag),
       id,
     ]);
 

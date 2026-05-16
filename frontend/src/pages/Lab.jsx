@@ -32,8 +32,8 @@ const fields = [
     type: "select",
     required: true,
     options: [
-      { value: "Negatif", label: "Negatif" },
-      { value: "Positif", label: "Positif" },
+      { value: "Non-Reaktif", label: "Non-Reaktif" },
+      { value: "Reaktif", label: "Reaktif" },
     ],
   },
 
@@ -83,7 +83,7 @@ const fields = [
     label: "HBSAG",
     type: "select",
     required: true,
-    options: ["Reaktif", "Non-Reaktif"],
+    options: ["Non-Reaktif", "Reaktif"],
   },
 ];
 

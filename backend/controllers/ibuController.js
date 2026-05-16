@@ -8,22 +8,35 @@ const {
 const GOLDAR_OPTIONS = ["A", "B", "AB", "O"];
 const STATUS_TT_OPTIONS = ["1", "2", "3", "4", "5"];
 const JENIS_KUNJUNGAN_OPTIONS = ["K1", "K6", "K8"];
+
 const STATUS_IBU_OPTIONS = [
   "Kunjungan Baru",
-  "Lama Kunjungan",
   "Kunjungan Lama",
   "baru",
   "lama",
 ];
 
+// NORMALIZE STATUS IBU
 const normalizeStatusIbu = (value) => {
-  if (value === "baru") return "Kunjungan Baru";
-  if (value === "lama" || value === "Kunjungan Lama") return "Lama Kunjungan";
+  if (value === "baru") {
+    return "Kunjungan Baru";
+  }
+
+  if (
+    value === "lama" ||
+    value === "Lama Kunjungan" ||
+    value === "Kunjungan Lama"
+  ) {
+    return "Kunjungan Lama";
+  }
+
   return value || "Kunjungan Baru";
 };
 
+// VALIDASI ENUM
 const validateEnum = (value, options, label) => {
   if (isBlank(value)) return null;
+
   return options.includes(String(value))
     ? null
     : `${label} harus salah satu dari: ${options.join(", ")}`;
@@ -34,20 +47,33 @@ const GetDataIbu = async (req, res, next) => {
   try {
     const query = `
       SELECT 
-        id, nama, tanggal_lahir, nama_suami, alamat,
-        no_hp, nik, no_jkn, no_rekam_medis, golongan_darah,
-        lila, status_tt, jenis_kunjungan, status_ibu,
+        id,
+        nama,
+        tanggal_lahir,
+        nama_suami,
+        alamat,
+        no_hp,
+        nik,
+        no_jkn,
+        no_rekam_medis,
+        lila,
+        status_tt,
+        jenis_kunjungan,
+        status_ibu,
         created_at
       FROM ibu
+      ORDER BY id ASC
     `;
 
     const [rows] = await db.execute(query);
-    const normalizedRows = normalizeRowsDateFieldsForClient(rows, ["tanggal_lahir"]).map(
-      (row) => ({
-        ...row,
-        status_ibu: normalizeStatusIbu(row.status_ibu),
-      })
-    );
+
+    const normalizedRows =
+      normalizeRowsDateFieldsForClient(rows, ["tanggal_lahir"]).map(
+        (row) => ({
+          ...row,
+          status_ibu: normalizeStatusIbu(row.status_ibu),
+        })
+      );
 
     return res.status(200).json({
       status: "success",
@@ -59,7 +85,6 @@ const GetDataIbu = async (req, res, next) => {
     next(error);
   }
 };
-
 
 // CREATE
 const CreateDataIbu = async (req, res, next) => {
@@ -73,16 +98,19 @@ const CreateDataIbu = async (req, res, next) => {
       nik,
       no_jkn,
       no_rekam_medis,
-      golongan_darah,
       lila,
       status_tt,
       jenis_kunjungan,
       status_ibu,
     } = req.body;
 
-    const normalizedTanggalLahir = normalizeDateForDatabase(tanggal_lahir);
-    const normalizedStatusIbu = normalizeStatusIbu(status_ibu);
+    const normalizedTanggalLahir =
+      normalizeDateForDatabase(tanggal_lahir);
 
+    const normalizedStatusIbu =
+      normalizeStatusIbu(status_ibu);
+
+    // VALIDASI FIELD WAJIB
     if (
       isBlank(nama) ||
       !normalizedTanggalLahir ||
@@ -90,15 +118,47 @@ const CreateDataIbu = async (req, res, next) => {
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
+        message:
+          "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
       });
     }
 
+    // VALIDASI NIK 16 DIGIT
+    if (!/^\d{16}$/.test(String(nik))) {
+      return res.status(400).json({
+        status: "error",
+        message: "NIK harus 16 digit angka",
+      });
+    }
+
+    // VALIDASI JKN 13 DIGIT
+    if (
+      !isBlank(no_jkn) &&
+      !/^\d{13}$/.test(String(no_jkn))
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message: "No. JKN harus 13 digit angka",
+      });
+    }
+
+    // VALIDASI ENUM
     const enumError =
-      validateEnum(golongan_darah, GOLDAR_OPTIONS, "Golongan darah") ||
-      validateEnum(status_tt, STATUS_TT_OPTIONS, "Status TT") ||
-      validateEnum(jenis_kunjungan, JENIS_KUNJUNGAN_OPTIONS, "Jenis kunjungan") ||
-      validateEnum(normalizedStatusIbu, STATUS_IBU_OPTIONS, "Status kunjungan");
+      validateEnum(
+        status_tt,
+        STATUS_TT_OPTIONS,
+        "Status TT"
+      ) ||
+      validateEnum(
+        jenis_kunjungan,
+        JENIS_KUNJUNGAN_OPTIONS,
+        "Jenis kunjungan"
+      ) ||
+      validateEnum(
+        normalizedStatusIbu,
+        STATUS_IBU_OPTIONS,
+        "Status ibu"
+      );
 
     if (enumError) {
       return res.status(400).json({
@@ -108,13 +168,21 @@ const CreateDataIbu = async (req, res, next) => {
     }
 
     const query = `
-      INSERT INTO ibu 
-      (
-        nama, tanggal_lahir, nama_suami, alamat, no_hp, nik,
-        no_jkn, no_rekam_medis, golongan_darah,
-        lila, status_tt, jenis_kunjungan, status_ibu
+      INSERT INTO ibu (
+        nama,
+        tanggal_lahir,
+        nama_suami,
+        alamat,
+        no_hp,
+        nik,
+        no_jkn,
+        no_rekam_medis,
+        lila,
+        status_tt,
+        jenis_kunjungan,
+        status_ibu
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     await db.execute(query, [
@@ -126,7 +194,6 @@ const CreateDataIbu = async (req, res, next) => {
       nik,
       no_jkn || "",
       no_rekam_medis || "",
-      golongan_darah || null,
       lila ?? null,
       status_tt || null,
       jenis_kunjungan || null,
@@ -143,7 +210,6 @@ const CreateDataIbu = async (req, res, next) => {
   }
 };
 
-
 // UPDATE
 const UpdateDataIbu = async (req, res, next) => {
   try {
@@ -158,16 +224,19 @@ const UpdateDataIbu = async (req, res, next) => {
       nik,
       no_jkn,
       no_rekam_medis,
-      golongan_darah,
       lila,
       status_tt,
       jenis_kunjungan,
       status_ibu,
     } = req.body;
 
-    const normalizedTanggalLahir = normalizeDateForDatabase(tanggal_lahir);
-    const normalizedStatusIbu = normalizeStatusIbu(status_ibu);
+    const normalizedTanggalLahir =
+      normalizeDateForDatabase(tanggal_lahir);
 
+    const normalizedStatusIbu =
+      normalizeStatusIbu(status_ibu);
+
+    // VALIDASI FIELD WAJIB
     if (
       isBlank(nama) ||
       !normalizedTanggalLahir ||
@@ -175,15 +244,47 @@ const UpdateDataIbu = async (req, res, next) => {
     ) {
       return res.status(400).json({
         status: "error",
-        message: "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
+        message:
+          "Field Nama, Tanggal Lahir, dan NIK wajib terisi",
       });
     }
 
+    // VALIDASI NIK
+    if (!/^\d{16}$/.test(String(nik))) {
+      return res.status(400).json({
+        status: "error",
+        message: "NIK harus 16 digit angka",
+      });
+    }
+
+    // VALIDASI JKN
+    if (
+      !isBlank(no_jkn) &&
+      !/^\d{13}$/.test(String(no_jkn))
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message: "No. JKN harus 13 digit angka",
+      });
+    }
+
+    // VALIDASI ENUM
     const enumError =
-      validateEnum(golongan_darah, GOLDAR_OPTIONS, "Golongan darah") ||
-      validateEnum(status_tt, STATUS_TT_OPTIONS, "Status TT") ||
-      validateEnum(jenis_kunjungan, JENIS_KUNJUNGAN_OPTIONS, "Jenis kunjungan") ||
-      validateEnum(normalizedStatusIbu, STATUS_IBU_OPTIONS, "Status kunjungan");
+      validateEnum(
+        status_tt,
+        STATUS_TT_OPTIONS,
+        "Status TT"
+      ) ||
+      validateEnum(
+        jenis_kunjungan,
+        JENIS_KUNJUNGAN_OPTIONS,
+        "Jenis kunjungan"
+      ) ||
+      validateEnum(
+        normalizedStatusIbu,
+        STATUS_IBU_OPTIONS,
+        "Status ibu"
+      );
 
     if (enumError) {
       return res.status(400).json({
@@ -193,8 +294,8 @@ const UpdateDataIbu = async (req, res, next) => {
     }
 
     const query = `
-      UPDATE ibu 
-      SET 
+      UPDATE ibu
+      SET
         nama=?,
         tanggal_lahir=?,
         nama_suami=?,
@@ -203,7 +304,6 @@ const UpdateDataIbu = async (req, res, next) => {
         nik=?,
         no_jkn=?,
         no_rekam_medis=?,
-        golongan_darah=?,
         lila=?,
         status_tt=?,
         jenis_kunjungan=?,
@@ -220,12 +320,10 @@ const UpdateDataIbu = async (req, res, next) => {
       nik,
       no_jkn || "",
       no_rekam_medis || "",
-      golongan_darah || null,
       lila ?? null,
       status_tt || null,
       jenis_kunjungan || null,
       normalizedStatusIbu,
-
       id,
     ]);
 
@@ -246,13 +344,16 @@ const UpdateDataIbu = async (req, res, next) => {
   }
 };
 
-
 // DELETE
 const DeleteDataIbu = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const query = "DELETE FROM ibu WHERE id = ?";
+    const query = `
+      DELETE FROM ibu
+      WHERE id = ?
+    `;
+
     const [result] = await db.execute(query, [id]);
 
     if (result.affectedRows === 0) {
