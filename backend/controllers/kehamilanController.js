@@ -1,4 +1,4 @@
-const {db} = require("../config/db");
+const { db } = require("../config/db");
 const {
   isBlank,
   normalizeArrayField,
@@ -7,12 +7,73 @@ const {
   validateIbuRelation,
 } = require("./helpers");
 
-// GET ALL
+// =========================
+// GET ALL KEHAMILAN (FIXED)
+// =========================
 const GetDataKehamilan = async (req, res, next) => {
   try {
-    const query = "SELECT * FROM kehamilan";
+    const query = `
+ SELECT
+  k.*,
+
+  -- usia minggu (AMAN)
+  TIMESTAMPDIFF(
+    WEEK,
+    NULLIF(k.hpht, '0000-00-00'),
+    CURDATE()
+  ) AS usia_kehamilan_minggu,
+
+  -- usia bulan (AMAN)
+  TIMESTAMPDIFF(
+    MONTH,
+    NULLIF(k.hpht, '0000-00-00'),
+    CURDATE()
+  ) AS usia_kehamilan_bulan,
+
+  -- label usia (AMAN TOTAL)
+  CASE
+    WHEN k.hpht IS NULL OR k.hpht = '0000-00-00' THEN 'Belum diketahui'
+    ELSE CONCAT(
+      TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()),
+      ' minggu (',
+      TIMESTAMPDIFF(MONTH, k.hpht, CURDATE()),
+      ' bulan)'
+    )
+  END AS usia_kehamilan_label,
+
+  -- kategori
+  CASE
+    WHEN k.hpht IS NULL OR k.hpht = '0000-00-00' THEN 'belum_diketahui'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 11 THEN 'kurang_dari_3_bulan'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 27 THEN 'kurang_dari_7_bulan'
+    ELSE 'tujuh_bulan_ke_atas'
+  END AS kategori_kehamilan,
+
+  -- label kategori
+  CASE
+    WHEN k.hpht IS NULL OR k.hpht = '0000-00-00' THEN 'Belum diketahui'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 11 THEN '< 3 bulan'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 27 THEN '< 7 bulan'
+    ELSE '>= 7 bulan'
+  END AS kategori_kehamilan_label,
+
+  -- trimester
+  CASE
+    WHEN k.hpht IS NULL OR k.hpht = '0000-00-00' THEN 'belum_diketahui'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 13 THEN 'Trimester I'
+    WHEN TIMESTAMPDIFF(WEEK, k.hpht, CURDATE()) <= 27 THEN 'Trimester II'
+    ELSE 'Trimester III'
+  END AS trimester_label
+
+FROM kehamilan k;
+`;
+
     const [rows] = await db.execute(query);
-    const normalizedRows = normalizeRowsDateFieldsForClient(rows, ["hpht", "hpl"]);
+
+    const normalizedRows = normalizeRowsDateFieldsForClient(
+      rows,
+      ["hpht", "hpl"]
+    );
 
     return res.status(200).json({
       status: "success",
@@ -24,7 +85,9 @@ const GetDataKehamilan = async (req, res, next) => {
   }
 };
 
+// =========================
 // CREATE
+// =========================
 const CreateDataKehamilan = async (req, res, next) => {
   try {
     const {
@@ -90,7 +153,9 @@ const CreateDataKehamilan = async (req, res, next) => {
   }
 };
 
+// =========================
 // UPDATE
+// =========================
 const UpdateDataKehamilan = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -109,7 +174,7 @@ const UpdateDataKehamilan = async (req, res, next) => {
     const normalizedHpht = normalizeDateForDatabase(hpht);
     const normalizedHpl = normalizeDateForDatabase(hpl);
 
-  if (
+    if (
       isBlank(ibu_id) ||
       !normalizedHpht ||
       !normalizedHpl ||
@@ -121,7 +186,6 @@ const UpdateDataKehamilan = async (req, res, next) => {
         message: "Field dasar kehamilan (HPHT, HPL, BB, IMT) wajib terisi",
       });
     }
-
 
     const relationError = await validateIbuRelation(ibu_id);
     if (relationError) {
@@ -167,7 +231,9 @@ const UpdateDataKehamilan = async (req, res, next) => {
   }
 };
 
+// =========================
 // DELETE
+// =========================
 const DeleteDataKehamilan = async (req, res, next) => {
   try {
     const { id } = req.params;
